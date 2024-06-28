@@ -1,0 +1,9 @@
+CorCondKPIAF = 
+var percentyoy = [VariaçãoEstab] /* Variação do Objeto
+ var icone = 
+    SWITCH(
+        TRUE(),
+        percentyoy > 0,"Green ",
+        percentyoy < 0,"Red ")
+    RETURN
+    icone

@@ -1,0 +1,34 @@
+Modo de uso
+
+Adicionar SubTitulo na aba titulo do Card 
+Insere a medida do ValorFormatado
+Medida inserida no Card vai ser a KPI
+
+configuração de Design padrão 
+
+SubTitulo = Calibri Negrito tamanho 35
+Valor do botão = Calibri Negrito tamanho 18
+Rotulo da Categoria  =  Calibri tamano 12
+Titulo = Calibri Negrito tamanho 15
+
+
+
+KPI = 
+
+ var percentyoy = [VariaçãoEstab] */variação do valor em %
+ var variacaoyoy = [PercentualEstabvalor] /* diferença valor
+
+ var variacaoFormatada = FORMAT(variacaoyoy,"##,00")
+
+ var percentformatado = 
+    FORMAT(percentyoy,"0.00%;-0.00%;0.00%")
+
+var icone = 
+    SWITCH(
+        TRUE(),
+        percentyoy > 0,"▲ ",
+        percentyoy < 0,"▼ ")
+--▲ ▼
+
+RETURN
+ icone &variacaoFormatada & " | " & percentformatado

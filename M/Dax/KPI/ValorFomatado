@@ -1,0 +1,10 @@
+NotaAFTotalFOrmatada = 
+ var valor = [Qt.Estabelecimentos]
+ var formato =
+SWITCH(
+    TRUE(),
+    valor >= 0, FORMAT(valor,"##,00"),
+    valor < 0 , FORMAT(valor,"-##,00")
+)
+RETURN
+formato
