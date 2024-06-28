@@ -1,0 +1,46 @@
+let
+    AnoInicial = 2010,
+    AnoFinal = 2025,
+    //Declara uma data inicial
+    DataInicial = Date.StartOfYear(#date(AnoInicial, 1, 1)),
+    //Declara uma data final
+    DataFinal = Date.EndOfYear(#date(AnoFinal, 12, 31)),
+    //Conta a quantidade de dias entre as duas datas
+    QtdeDias = Duration.Days(DataFinal-DataInicial)+1,
+    //Cria lista de datas
+    Datalist = List.Dates(DataInicial,QtdeDias,#duration(1,0,0,0)),
+    //Converter para Tabela
+    ConvertTabela = Table.FromList(Datalist, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    //Altera Tipo
+    AlteraTipo = Table.TransformColumnTypes(ConvertTabela,{{"Column1", type date}}),
+    //Renomeia Coluna
+    RenomeiaColuna = Table.RenameColumns(AlteraTipo,{"Column1", "Data"}),
+ 
+    //Criação de Colunas Adicionais
+    //Criar Coluna ANO
+    Ano = Table.AddColumn(RenomeiaColuna, "Ano", each Date.Year([Data]),Int64.Type),
+    //Criar Coluna Mês
+    Mes = Table.AddColumn(Ano, "Mes", each Date.Month([Data]),Int64.Type),
+    //Criar Coluna Nome do Mês
+    Nome_Mes = Table.AddColumn(Mes, "Nome_Mes", each Date.MonthName([Data]), type text),
+    //Criar Coluna Dia
+    Dia_do_Mes = Table.AddColumn(Nome_Mes, "Dia_Mes", each Date.Day([Data]), Int64.Type),
+    //Criar Coluna Dia do Ano
+    Dia_do_Ano = Table.AddColumn(Dia_do_Mes, "Dia_Ano", each Date.DayOfYear([Data]), Int64.Type),
+    //Criar Coluna Dia da Semana
+    Dia_Semana = Table.AddColumn(Dia_do_Ano, "Dia_Semana", each Date.DayOfWeek([Data]), Int64.Type),
+    //Criar Coluna Dia da Semana
+    Nome_Dia_Semana = Table.AddColumn(Dia_Semana, "Nome_Dia_Semana", each Date.DayOfWeekName([Data]), type text),
+    //Criar Coluna Dia da Semana
+    Trimestre = Table.AddColumn(Nome_Dia_Semana, "Trimestre", each Date.QuarterOfYear([Data]), Int64.Type),
+    //Criar Coluna Semana do Ano
+    Semana_Ano = Table.AddColumn(Trimestre, "Semana_Ano", each Date.WeekOfYear([Data]), Int64.Type),
+    //Criar Coluna Semana do Mes
+    Semana_Mes = Table.AddColumn(Semana_Ano, "Semana_Mes", each Date.WeekOfMonth([Data]), Int64.Type),
+    #"Colocar Cada Palavra Em Maiúscula" = Table.TransformColumns(Semana_Mes,{{"Nome_Mes", Text.Proper, type text}}),
+    #"Primeiros Caracteres Inseridos" = Table.AddColumn(#"Colocar Cada Palavra Em Maiúscula", "Primeiros caracteres", each Text.Start([Nome_Mes], 3), type text),
+    #"Colocar Cada Palavra Em Maiúscula1" = Table.TransformColumns(#"Primeiros Caracteres Inseridos",{{"Nome_Dia_Semana", Text.Proper, type text}}),
+    #"Primeiros Caracteres Inseridos1" = Table.AddColumn(#"Colocar Cada Palavra Em Maiúscula1", "Primeiros caracteres.1", each Text.Start([Nome_Dia_Semana], 3), type text)
+
+in
+    #"Primeiros Caracteres Inseridos1"

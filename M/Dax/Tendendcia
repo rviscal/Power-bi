@@ -1,0 +1,7 @@
+Qtd Dias = DISTINCTCOUNT(Calendario[Data]) 
+Qdias corridos = CALCULATE([Qtd Dias],FILTER(Calendario,Calendario[Data] <TODAY()) )
+Qtd Dias Restante = [Qtd Dias] - [Qdias Ocorridos]
+Media Diaria = DIVIDE(Soma Geral dos Valores ,[Qdias Ocorridos])
+Tendencia = [Media Diaria] * [Qtd Dias]
+
+
