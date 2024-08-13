@@ -1,0 +1,52 @@
+"
+<div class=loader>
+            
+            <div class=load></div> <!-- % em T-Shirt -->
+    </div> 
+<style>
+.loader {
+  width: 100vw;
+  height: 8px;
+  position: relative;
+   background-color:rgb(248, 248, 248);
+    border-radius: 25px;
+    
+}
+
+
+.load {
+  background-color: #49a031;
+  border-radius: 25px;
+  display: block;
+  height: 8px;
+  width: 8px;
+  bottom: 0;
+  opacity: 60%;
+  position: absolute;
+  animation:  moving 10s ease-in-out  infinite;
+}
+
+.load::before {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  background-color: #D1C2FF;
+  border-radius: inherit;
+  
+}
+@keyframes moving {
+  50% {
+    width: 100%;
+  }
+
+  100% {
+    width: 0;
+    right: 0;
+    left: unset;
+  }
+}
+
+
+</style>
+"

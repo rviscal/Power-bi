@@ -1,0 +1,41 @@
+BordaInfraEstrutura pulse = 
+"
+<div class=loader>
+            
+            <div class=load></div> <!-- % em T-Shirt -->
+    </div> 
+<style>
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+ height: 100vh;
+  
+  
+}
+
+
+.load {
+  background-color: #FDC400;
+  border-radius: 25px;
+  height: 10px;
+  width: 100vw;
+  bottom: 0;
+  opacity: 60%;
+  
+  animation:  moving 4s infinite;
+}
+
+
+@keyframes moving {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0, 0, 0, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(0, 0, 0, 0);
+  }
+}
+
+</style>
+"

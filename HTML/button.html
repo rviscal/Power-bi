@@ -1,0 +1,91 @@
+Botaocss = 
+Lembretes para mudar icone do botão e nescessario fazer upload da imagem e alterar 
+
+var link = colocar Urlcaso queira
+var TextButton = "Economia" 
+
+RETURN
+ "
+ 
+<button class=Btn>
+  
+  <div class=""sign"">
+  <a href="&link&"><img src=""https://i.ibb.co/xDRjRWh/image-13.png"" alt=""image-13"" border=""0""></a></div>
+  
+  <div class=text>"&TextButton&"</div>
+</button>
+
+
+<Style>
+.Btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 45px;
+  height: 45px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+   position: relative;
+  overflow: hidden;
+  transition-duration: 3s;
+  background-color: rgb(72, 116, 196);
+}
+
+/* plus sign */
+.sign {
+  width: 100%;
+  transition-duration: 10s;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  justify-content: center;
+}
+
+.sign {
+ 
+  width: 50px;
+  height:50px;
+  padding-top:10px;
+  position: absolute;
+}
+
+
+/* text */
+.text {
+  position: absolute;
+  right: 0%;
+  width: 0%;
+  opacity: 0;
+  color: white;
+  font-size: 1.2em;
+  font-weight: 600;
+  transition-duration: 10s;
+}
+/* hover effect on button width */
+.Btn:hover {
+  width: 100vw;
+  border-radius: 40px;
+  transition-duration: .3s;
+  position: fixed;
+  z-index: 999;
+}
+
+.Btn:hover .sign {
+  width: 30%;
+  transition-duration: 0.3s;
+  padding-left: 20px;
+}
+/* hover effect button's text */
+.Btn:hover .text {
+  opacity: 1;
+  width: 70%;
+  transition-duration: 0.3s;
+  padding-right: 10px;
+}
+/* button click effect*/
+.Btn:active {
+  transform: translate(2px ,2px);
+}
+</Style>
+ "
