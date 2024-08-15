@@ -1,9 +1,10 @@
 
+
 //********Configurações********
 
     let 
     //Especifique a data inicial 
-    dataInicial = #date(2023, 1, 1), 
+    dataInicial = #date(2024, 1, 1), 
 
     //Especifique a data final. Padrão: Final do ano atual 
     dataFinal = Date.EndOfYear ( Date.From ( DateTime.LocalNow ( ) ) ), 
@@ -158,6 +159,8 @@
             mesNome = Text.Proper ( Date.MonthName ( data, idioma ) ), 
             mesIndiceZws = Text.Repeat ( zws, 12 - mes ), 
             mesAnoIndice = 12 * ( ano - anoInicial ) + mes, 
+            inicioMes = Date.StartOfMonth ( data ),
+            fimMes = Date.EndOfMonth ( data ),
             diaMes = Date.Day ( data ), 
             mesOffset =  ( ( ano * 12 ) - 1 + mes ) - ( ( anoAtual * 12 ) - 1 + mesAtual ), 
             trimestreOffset = ( ( ano * 4 ) - 1 + trimestre ) - ( ( anoAtual * 4 ) - 1 + trimestreAtual ), 
@@ -220,7 +223,7 @@
                 if mesDiaNo >= 621 and mesDiaNo <= 921 then 2 else 
                 if mesDiaNo >= 922 and mesDiaNo <= 1221 then 3 else 
                 4 ,
-            dataReferenciaFechamento = if diaMes <= 15 then data else Date.AddMonths ( data, 1 )  
+            dataReferenciaFechamento = if diaMes <= diaInicioMesFechamento - 1 then data else Date.AddMonths ( data, 1 )  
 
         in 
         //Saída das transformações 
@@ -474,6 +477,13 @@
             //QuinzenaMesAnoNome 
             quinzenaMesAno, 
 
+            //QuinzenaPeriodo
+            let 
+                inicioQuinzena = if quinzenaDoMesNo = 1 then inicioMes else Date.AddDays ( inicioMes, 15  ),
+                fimQuinzena = if quinzenaDoMesNo = 2 then fimMes else Date.AddDays ( inicioMes, 14 )
+            in
+                Date.ToText ( inicioQuinzena, "dd/MM/yyyy" ) & " a " & Date.ToText ( fimQuinzena, "dd/MM/yyyy" ),
+
             //QuinzenaIndice
             quinzenaIndice,
 
@@ -562,8 +572,10 @@
             Date.Year ( dataReferenciaFechamento ) * 100 + Date.Month ( dataReferenciaFechamento ),
 
             //MesAnoFechamentoNome
-            Text.Proper ( Date.ToText ( dataReferenciaFechamento, [ Format = "MMM/yy", Culture = idioma ] ) )
-            
+            Text.Proper ( Date.ToText ( dataReferenciaFechamento, [ Format = "MMM/yy", Culture = idioma ] ) ),
+
+            //DataFutura
+            dataOffset > 0
 
         }, 
 
@@ -647,6 +659,7 @@
             QuinzenaMesNome = text, 
             QuinzenaMesAnoNum = Int64.Type, 
             QuinzenaMesAnoNome = text, 
+            QuinzenaPeriodo = text,
             QuinzenaIndice = Int64.Type, 
             QuinzenaOffset = Int64.Type, 
             QuinzenaMesAnoNomeAtual = text, 
@@ -672,7 +685,8 @@
             MesFechamentoNomeAbrev = text, 
             AnoFechamentoNum = Int64.Type,
             MesAnoFechamentoNum = Int64.Type,
-            MesAnoFechamentoNome = text 
+            MesAnoFechamentoNome = text,
+            DataFutura = Logical.Type 
         ], 
 
         //Invoca função de transformação 
