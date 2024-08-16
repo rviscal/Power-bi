@@ -1,0 +1,18 @@
+(NomeRota) =>
+let
+BaseUrl = "http://177.137.228.206:9090/",
+    Path = "android/json/oracle/inovatta/"&NomeRota&".php",
+    Fonte = Web.Contents(BaseUrl, [RelativePath = Path]),
+
+    // Dados da Requisição
+    #"Tabela extraída de HTML" = Html.Table(Fonte, {{"Column1", "BODY"}}),
+
+    // Extração da Tabela
+    request = #"Tabela extraída de HTML"[Column1]{0},
+
+    // Conversão para Json
+    jsonObject = Json.Document(request)
+
+
+in 
+    jsonObject

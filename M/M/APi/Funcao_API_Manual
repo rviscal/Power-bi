@@ -1,0 +1,43 @@
+(dtInical,dtFim) =>
+let
+    BaseUrl = "http://177.137.228.206:9090/",
+    Path = "android/json/oracle/inovatta/Vendas.php",
+    QueryParams = [
+        inicio = dtInical,
+        fim = dtFim
+    ],
+    Fonte = Web.Contents(BaseUrl, [RelativePath = Path,Query = QueryParams]),
+    
+    // Dados da Requisição
+    #"Tabela extraída de HTML" = Html.Table(Fonte, {{"Column1", "BODY"}}),
+
+    // Extração da Tabela
+    request = #"Tabela extraída de HTML"[Column1]{0},
+
+    // Conversão para Json
+    jsonObject = Json.Document(request),
+
+    // Converter o objeto JSON para uma tabela
+    Tabela = jsonObject[VENDAS],
+    TabelaFinal = Table.FromList(Tabela, Splitter.SplitByNothing(), {"Record"}),
+
+  
+  // Expandir a coluna 'Record' para colunas individuais
+    resultado = Table.ExpandRecordColumn(TabelaFinal, "Record", {"Filial", "Cod_produto", "DataVenda", "Quantidade","CustoCompra","Promocao"}),
+
+  
+    // Função para substituir pontos por vírgulas e adicionar zero à esquerda se necessário
+    adjustDecimal = (text) => 
+        let
+            replaced = Text.Replace(text, ".", ","),
+            withZero = if Text.StartsWith(replaced, ",") then "0" & replaced else replaced
+        in
+            withZero,
+
+    // Aplicar a função às colunas especificadas
+    resultadoFinal = Table.TransformColumns(resultado, {
+        {"CustoCompra", each adjustDecimal(_), type text}
+       
+    })
+in
+    resultadoFinal

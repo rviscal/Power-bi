@@ -1,0 +1,23 @@
+let
+    // Definir a data de início e a data atual
+    DataInicial = #date(2024, 8, 1),
+    DataFinal = Date.From(DateTime.LocalNow()),
+
+    // Gerar uma lista de datas do primeiro dia de cada mês entre DataInicial e DataFinal
+    ListaMeses = List.Dates(DataInicial, Number.RoundDown(Duration.Days(DataFinal - DataInicial) / 30), #duration(30, 0, 0, 0)),
+
+    // Transformar a lista de datas em uma tabela
+    DateTable = Table.FromList(ListaMeses, Splitter.SplitByNothing(), {"DataInicial"}, null, ExtraValues.Error),
+
+    // Ajustar a tabela para incluir todos os meses corretamente
+    ListaTodosMeses = List.Transform(List.Numbers(0, Duration.Days(DataFinal - DataInicial) + 1), each Date.AddDays(DataInicial, _)),
+    FiltrarMeses = List.Select(ListaTodosMeses, each Date.Day(_) = 1),
+    TabFinal = Table.FromList(FiltrarMeses, Splitter.SplitByNothing(), {"DataInicial"}),
+    AddColunaAno = Table.AddColumn(TabFinal, "Ano", each Date.Year([DataInicial]), Int64.Type),
+    AddColunaMes = Table.AddColumn(AddColunaAno, "Mês", each Date.Month([DataInicial]), Int64.Type),
+    AddColunaDataInicialFormatada = Table.AddColumn(AddColunaMes, "DataInicioFormat", each Date.ToText([DataInicial], "yyyy-MM-dd"), type text),
+    AddColunaDataFinal = Table.AddColumn(AddColunaDataInicialFormatada, "DataFinal", each Date.ToText(Date.EndOfMonth([DataInicial]), "yyyy-MM-dd"), type text),
+    #"Função Personalizada Invocada" = Table.AddColumn(AddColunaDataFinal, "fn_VendasRequest", each fn_VendasRequest([DataInicioFormat], [DataFinal])),
+    
+in
+    #"Função Personalizada Invocada"
