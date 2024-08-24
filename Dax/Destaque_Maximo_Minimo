@@ -1,0 +1,21 @@
+Destaque_Maior_Menor_Produtos_Tranferidos = 
+VAR Maximo =  CALCULATE(
+                MAXX(
+                    VALUES(Calendario[Nome_Mes]),
+                       [Qtd. Produtos Transferidos]),
+                       ALLSELECTED(Calendario)
+                       )
+VAR Minimo =  CALCULATE(
+                MINX(
+                    VALUES(Calendario[Nome_Mes]),
+                       [Qtd. Produtos Transferidos]),
+                       ALLSELECTED(Calendario)
+                       )
+VAR Resultado = SWITCH(
+                TRUE(),
+                    [Qtd. Produtos Transferidos] = Maximo, "#02ac31",
+                    [Qtd. Produtos Transferidos] = Minimo, "#ff0310",
+                    "#1A2299"
+                       )
+RETURN
+    Resultado
