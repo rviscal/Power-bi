@@ -1,0 +1,9 @@
+Top_10_Clientes = 
+
+VAR Top10Cli = CALCULATE(
+                        [Total de Vendas],
+                        KEEPFILTERS(TOPN(10,ALL(MBO_CLIENTE[NM_FANTASIA]),[Total de Vendas])
+                                    )
+                        )
+RETURN
+IF(Top10Cli = 0,BLANK(),Top10Cli)
