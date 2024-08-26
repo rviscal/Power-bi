@@ -1,0 +1,35 @@
+VAR maximo = CALCULATE(MAX('Assiduidade Geral'[Assiduidade ]),ALL('Assiduidade Geral'))
+
+VAR Soma_Assiduidade = SUM('Assiduidade Geral'[Assiduidade ])
+
+VAR Blue = "BLUE"
+VAR Verde = "Green"
+VAR Vermelho = "Red"
+VAR Amarelo = "yellow"
+
+VAR Blue = "BLUE"
+VAR Verde = "Green"
+VAR Vermelho = "Red"
+VAR Amarelo = "yellow"
+
+VAR ICONE_BOLA_AZUL = "data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'> <path d='M50,4A46,46,0,1,1,4,50,46.06,46.06,0,0,1,50,4m0-3A49,49,0,1,0,99,50,49,49,0,0,0,50,1Z' style='fill: "&Blue&"'/> <circle cx='50' cy='50' r='49' style='fill: "&Blue&"'/> </svg>"
+
+VAR ICONE_BOLA_VERDE = "data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'> <path d='M50,4A46,46,0,1,1,4,50,46.06,46.06,0,0,1,50,4m0-3A49,49,0,1,0,99,50,49,49,0,0,0,50,1Z' style='fill: "&Verde&"'/> <circle cx='50' cy='50' r='49' style='fill: "&Verde&"'/> </svg>"
+
+VAR ICONE_BOLA_AMARELO = "data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'> <path d='M50,4A46,46,0,1,1,4,50,46.06,46.06,0,0,1,50,4m0-3A49,49,0,1,0,99,50,49,49,0,0,0,50,1Z' style='fill: "&Amarelo&"'/> <circle cx='50' cy='50' r='49' style='fill: "&Amarelo&"'/> </svg>"
+
+VAR ICONE_BOLA_VERMELHO ="data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'> <path d='M50,4A46,46,0,1,1,4,50,46.06,46.06,0,0,1,50,4m0-3A49,49,0,1,0,99,50,49,49,0,0,0,50,1Z' style='fill: "&Vermelho&"'/> <circle cx='50' cy='50' r='49' style='fill: "&Vermelho&"'/> </svg>"
+
+
+
+var sw =
+        SWITCH(
+            TRUE(),
+                Soma_Assiduidade = maximo,ICONE_BOLA_AZUL,
+                Soma_Assiduidade <= maximo && Soma_Assiduidade >= 0.67 ,VAR ICONE_BOLA_VERDE,
+                Soma_Assiduidade < 0.67 && Soma_Assiduidade >= 0.34 ,VAR ICONE_BOLA_AMARELO,
+                Soma_Assiduidade < 0.33 && Soma_Assiduidade >= 0 ,VAR ICONE_BOLA_VERMELHO
+                
+                )
+RETURN
+sw
