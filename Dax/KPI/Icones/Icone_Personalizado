@@ -1,3 +1,5 @@
+ICONE_Condicional = 
+
 VAR maximo = CALCULATE(MAX('Assiduidade Geral'[Assiduidade ]),ALL('Assiduidade Geral'))
 
 VAR Soma_Assiduidade = SUM('Assiduidade Geral'[Assiduidade ])
@@ -26,9 +28,9 @@ var sw =
         SWITCH(
             TRUE(),
                 Soma_Assiduidade = maximo,ICONE_BOLA_AZUL,
-                Soma_Assiduidade <= maximo && Soma_Assiduidade >= 0.67 ,VAR ICONE_BOLA_VERDE,
-                Soma_Assiduidade < 0.67 && Soma_Assiduidade >= 0.34 ,VAR ICONE_BOLA_AMARELO,
-                Soma_Assiduidade < 0.33 && Soma_Assiduidade >= 0 ,VAR ICONE_BOLA_VERMELHO
+                Soma_Assiduidade <= maximo && Soma_Assiduidade >= 0.67 , ICONE_BOLA_VERDE,
+                Soma_Assiduidade < 0.67 && Soma_Assiduidade >= 0.34 , ICONE_BOLA_AMARELO,
+                Soma_Assiduidade < 0.33 && Soma_Assiduidade >= 0 , ICONE_BOLA_VERMELHO
                 
                 )
 RETURN
