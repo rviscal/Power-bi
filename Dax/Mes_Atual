@@ -1,0 +1,3 @@
+Coluna Calculada
+
+NomeMesFiltro = IF(Calendario[Mes] = MONTH(TODAY()), "Mês Vigente",Calendario[Nome_Mes])
