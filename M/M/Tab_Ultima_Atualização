@@ -1,0 +1,8 @@
+let
+    Fonte = DateTime.LocalNow(),
+    #"Convertido para Tabela" = #table(1, {{Fonte}}),
+    #"Tipo Alterado" = Table.TransformColumnTypes(#"Convertido para Tabela",{{"Column1", type datetimezone}}),
+    #"Personalização Adicionada" = Table.AddColumn(#"Tipo Alterado", "Personalizar", each DateTimeZone.SwitchZone([Column1],-3)),
+    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"Personalizar", type datetimezone}})
+in
+    #"Tipo Alterado1"
