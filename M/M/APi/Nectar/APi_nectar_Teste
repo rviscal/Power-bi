@@ -1,0 +1,61 @@
+           Fonte =
+         Json.Document(Web.Contents(
+             "https://app.nectarcrm.com.br/crm/api/1/big-data/load-report/9175?initialDate=2024-01-01&endDate=2024-26-08&aggregator=0",
+              [Headers=[#"Access-token"="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MDE4ODcxMzQsImV4cCI6MTgyODA2MjAwMCwidXNlckxvZ2luIjoiaW50ZWxpZ2VuY2lhLmllbEBmaWVnLmNvbS5iciIsInVzZXJJZCI6IjE0Nzg5NSIsInVzdWFyaW9NYXN0ZXJJZCI6IjEyODQwIn0.wE0V2M97HXQUu9Cx7Lfik0PWglV3dgc3-H3Q0ZQGr70"]]),
+               1250),
+  
+
+
+
+               (dtInical,dtFim) =>
+                let
+                    BaseUrl = "http://177.137.228.206:9090/",
+                    Path = "android/json/oracle/inovatta/Vendas.php",
+                    QueryParams = [
+                        inicio = dtInical,
+                        fim = dtFim
+                    ],
+                    Fonte = Web.Contents(BaseUrl, [RelativePath = Path,Query = QueryParams]),
+                    
+                    // Dados da Requisição
+                    #"Tabela extraída de HTML" = Html.Table(Fonte, {{"Column1", "BODY"}}),
+                
+                    // Extração da Tabela
+                    request = #"Tabela extraída de HTML"[Column1]{0},
+                
+                    // Conversão para Json
+                    jsonObject = Json.Document(request),
+                
+                    // Converter o objeto JSON para uma tabela
+                    Tabela = jsonObject[VENDAS],
+                    TabelaFinal = Table.FromList(Tabela, Splitter.SplitByNothing(), {"Record"}),
+                
+                  
+                  // Expandir a coluna 'Record' para colunas individuais
+                    resultado = Table.ExpandRecordColumn(TabelaFinal, "Record", {"Filial", "Cod_produto", "DataVenda", "Quantidade","CustoCompra","Promocao"}),
+                
+                  
+                    // Função para substituir pontos por vírgulas e adicionar zero à esquerda se necessário
+                    adjustDecimal = (text) => 
+                        let
+                            replaced = Text.Replace(text, ".", ","),
+                            withZero = if Text.StartsWith(replaced, ",") then "0" & replaced else replaced
+                        in
+                            withZero,
+                
+                    // Aplicar a função às colunas especificadas
+                    resultadoFinal = Table.TransformColumns(resultado, {
+                        {"CustoCompra", each adjustDecimal(_), type text}
+                       
+                    })
+                in
+                    resultadoFinal
+
+
+
+//  https://app.nectarcrm.com.br/crm/api/1/big-data/load-report/9175&aggregator=0&api_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MDE4ODcxMzQsImV4cCI6MTgyODA2MjAwMCwidXNlckxvZ2luIjoiaW50ZWxpZ2VuY2lhLmllbEBmaWVnLmNvbS5iciIsInVzZXJJZCI6IjE0Nzg5NSIsInVzdWFyaW9NYXN0ZXJJZCI6IjEyODQwIn0.wE0V2M97HXQUu9Cx7Lfik0PWglV3dgc3-H3Q0ZQGr70
+
+//https://app.nectarcrm.com.br/crm/api/1/big-data/load-report/9175?initialDate=2024-01-01&endDate=2024-26-08&aggregator=0&api_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MDE4ODcxMzQsImV4cCI6MTgyODA2MjAwMCwidXNlckxvZ2luIjoiaW50ZWxpZ2VuY2lhLmllbEBmaWVnLmNvbS5iciIsInVzZXJJZCI6IjE0Nzg5NSIsInVzdWFyaW9NYXN0ZXJJZCI6IjEyODQwIn0.wE0V2M97HXQUu9Cx7Lfik0PWglV3dgc3-H3Q0ZQGr70
+
+
+Consideraçőes õ de perda

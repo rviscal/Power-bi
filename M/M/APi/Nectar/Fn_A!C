@@ -1,0 +1,17 @@
+(dtInical as text, dtFim as text) as table =>
+let
+    BaseUrl = "https://app.nectarcrm.com.br/crm/api/1/big-data/load-report/10106",
+    QueryParams = [
+        initialDate = dtInical,
+        endDate = dtFim,
+        aggregator = "2",
+        api_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MDE4ODcxMzQsImV4cCI6MTgyODA2MjAwMCwidXNlckxvZ2luIjoiaW50ZWxpZ2VuY2lhLmllbEBmaWVnLmNvbS5iciIsInVzZXJJZCI6IjE0Nzg5NSIsInVzdWFyaW9NYXN0ZXJJZCI6IjEyODQwIn0.wE0V2M97HXQUu9Cx7Lfik0PWglV3dgc3-H3Q0ZQGr70"
+    ],
+    Fonte = Json.Document(Web.Contents(BaseUrl, [Query = QueryParams]), 1250),
+
+    Tabela = if Type.Is(Value.Type(Fonte), List.Type) then Fonte else Fonte[Data],
+
+    TabelaExpandida = Table.FromList(Tabela, Splitter.SplitByNothing(), {"Record"})
+
+ in
+    TabelaExpandida

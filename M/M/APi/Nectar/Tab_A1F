@@ -1,0 +1,47 @@
+let
+    // Definir a data de início
+    DataInicial = #date(2024, 1, 1),
+    
+    // Definir a data final como a data de hoje
+    DataFinal = Date.From(DateTime.LocalNow()),
+
+    // Gerar uma lista de datas do primeiro dia de cada mês entre DataInicial e DataFinal
+    ListaMeses = List.Dates(DataInicial, Number.RoundDown(Duration.Days(DataFinal - DataInicial) + 1), #duration(1, 0, 0, 0)),
+
+    // Transformar a lista de datas em uma tabela
+    DateTable = Table.FromList(ListaMeses, Splitter.SplitByNothing(), {"DataInicial"}, null, ExtraValues.Error),
+
+    // Adicionar colunas de ano, mês e data final
+    AddColunaAno = Table.AddColumn(DateTable, "Ano", each Date.Year([DataInicial]), Int64.Type),
+    AddColunaMes = Table.AddColumn(AddColunaAno, "Mês", each Date.Month([DataInicial]), Int64.Type),
+    AddColunaDataFinal = Table.AddColumn(AddColunaMes, "DataFinal", each Date.EndOfMonth([DataInicial]), type date),
+
+    // Ajustar a última linha para usar a data de hoje como DataFinal
+    AjustarUltimaLinha = Table.ReplaceValue(AddColunaDataFinal, each Date.EndOfMonth([DataInicial]), each if [DataFinal] > DataFinal then DataFinal else [DataFinal], Replacer.ReplaceValue, {"DataFinal"}),
+
+    // Converter datas para texto no formato "yyyy-MM-dd"
+    AddColunaDataInicioFormat = Table.TransformColumns(AjustarUltimaLinha, {{"DataInicial", each Date.ToText(_, "yyyy-MM-dd"), type text}}),
+    AddColunaDataFinalFormat = Table.TransformColumns(AddColunaDataInicioFormat, {{"DataFinal", each Date.ToText(_, "yyyy-MM-dd"), type text}}),
+
+    // Invocar a função personalizada para cada linha da tabela
+    #"Função Personalizada Invocada" = Table.AddColumn(AddColunaDataFinalFormat, "Fn_API", each Fn_API_A1F([DataInicial], [DataFinal])),
+    #"Fn_API Expandido" = Table.ExpandTableColumn(#"Função Personalizada Invocada", "Fn_API", {"Record"}, {"Record"}),
+    #"Record Expandido" = Table.ExpandRecordColumn(#"Fn_API Expandido", "Record", {"Consideraçőes de perda", "Contato", "Contato: CNPJ", "Contato: E-mail", "Contato: ID", "Contato: Telefone", "Contato: CPF", "Código da Oportunidade", "Data criaçăo", "Fase", "Fechamento", "Funil", "Funil: etapa", "Nome", "Origem", "Responsável", "Valor mensal (MRR)", "Valor total", "Valor único", "Contato:SEGMENTO", "Contato:PORTE", "Motivos ganho/perda", "Sub-motivos de ganho/perda", "Tag Cliente/Oportunidade: #M/Inove+Digital", "Tag Cliente/Oportunidade: #M/2205CasaPos", "Tag Cliente/Oportunidade: #M/2206CasaTalentos", "Tag Cliente/Oportunidade: #M/2206Talentos", "Tag Cliente/Oportunidade: #M/2205Pos", "Tag Cliente/Oportunidade: #LICITAÇĂO", "Tag Cliente/Oportunidade: #M/2206FNC", "Tag Cliente/Oportunidade: #M/2208InoveConst", "Tag Cliente/Oportunidade: #LACASA", "Tag Cliente/Oportunidade: #M/2207CampanhaOFF", "Tag Cliente/Oportunidade: #Inove+Obra", "Tag Cliente/Oportunidade: #StagioWars", "Produto: nome", "Produto: Categoria", "Produto: Subcategoria", "Produto: Quantidade", "Produto: Quantidade de Recorręncia", "Produto: Recorręncia", "Nş do TCE ou Contrato"}, {"Consideraçőes de perda", "Contato", "Contato: CNPJ", "Contato: E-mail", "Contato: ID", "Contato: Telefone", "Contato: CPF", "Código da Oportunidade", "Data criaçăo", "Fase", "Fechamento", "Funil", "Funil: etapa", "Nome", "Origem", "Responsável", "Valor mensal (MRR)", "Valor total", "Valor único", "Contato:SEGMENTO", "Contato:PORTE", "Motivos ganho/perda", "Sub-motivos de ganho/perda", "Tag Cliente/Oportunidade: #M/Inove+Digital", "Tag Cliente/Oportunidade: #M/2205CasaPos", "Tag Cliente/Oportunidade: #M/2206CasaTalentos", "Tag Cliente/Oportunidade: #M/2206Talentos", "Tag Cliente/Oportunidade: #M/2205Pos", "Tag Cliente/Oportunidade: #LICITAÇĂO", "Tag Cliente/Oportunidade: #M/2206FNC", "Tag Cliente/Oportunidade: #M/2208InoveConst", "Tag Cliente/Oportunidade: #LACASA", "Tag Cliente/Oportunidade: #M/2207CampanhaOFF", "Tag Cliente/Oportunidade: #Inove+Obra", "Tag Cliente/Oportunidade: #StagioWars", "Produto: nome", "Produto: Categoria", "Produto: Subcategoria", "Produto: Quantidade", "Produto: Quantidade de Recorręncia", "Produto: Recorręncia", "Nş do TCE ou Contrato"}),
+    #"Valor Substituído" = Table.ReplaceValue(#"Record Expandido","Ş","ª",Replacer.ReplaceText,{"Funil: etapa"}),
+    #"Valor Substituído1" = Table.ReplaceValue(#"Valor Substituído","Ă","Ã",Replacer.ReplaceValue,{"Consideraçőes de perda", "Contato", "Contato: CNPJ", "Contato: ID", "Contato: CPF", "Código da Oportunidade", "Data criaçăo", "Fase", "Fechamento", "Funil", "Funil: etapa", "Nome", "Origem", "Responsável", "Valor mensal (MRR)", "Valor total", "Valor único", "Contato:SEGMENTO", "Contato:PORTE", "Motivos ganho/perda", "Sub-motivos de ganho/perda", "Tag Cliente/Oportunidade: #M/Inove+Digital", "Tag Cliente/Oportunidade: #M/2205CasaPos", "Tag Cliente/Oportunidade: #M/2206CasaTalentos", "Tag Cliente/Oportunidade: #M/2206Talentos", "Tag Cliente/Oportunidade: #M/2205Pos", "Tag Cliente/Oportunidade: #LICITAÇĂO", "Tag Cliente/Oportunidade: #M/2206FNC", "Tag Cliente/Oportunidade: #M/2208InoveConst", "Tag Cliente/Oportunidade: #LACASA", "Tag Cliente/Oportunidade: #M/2207CampanhaOFF", "Tag Cliente/Oportunidade: #Inove+Obra", "Tag Cliente/Oportunidade: #StagioWars", "Produto: nome", "Produto: Categoria", "Produto: Subcategoria", "Produto: Quantidade", "Produto: Quantidade de Recorręncia", "Produto: Recorręncia", "Nş do TCE ou Contrato"}),
+    #"Valor Substituído2" = Table.ReplaceValue(#"Valor Substituído1","ă","ã",Replacer.ReplaceText,{"Consideraçőes de perda", "Contato", "Contato: CNPJ", "Contato: ID", "Contato: CPF", "Código da Oportunidade", "Data criaçăo", "Fase", "Fechamento", "Funil", "Funil: etapa", "Nome", "Origem", "Responsável", "Valor mensal (MRR)", "Valor total", "Valor único", "Contato:SEGMENTO", "Contato:PORTE", "Motivos ganho/perda", "Sub-motivos de ganho/perda", "Tag Cliente/Oportunidade: #M/Inove+Digital", "Tag Cliente/Oportunidade: #M/2205CasaPos", "Tag Cliente/Oportunidade: #M/2206CasaTalentos", "Tag Cliente/Oportunidade: #M/2206Talentos", "Tag Cliente/Oportunidade: #M/2205Pos", "Tag Cliente/Oportunidade: #LICITAÇĂO", "Tag Cliente/Oportunidade: #M/2206FNC", "Tag Cliente/Oportunidade: #M/2208InoveConst", "Tag Cliente/Oportunidade: #LACASA", "Tag Cliente/Oportunidade: #M/2207CampanhaOFF", "Tag Cliente/Oportunidade: #Inove+Obra", "Tag Cliente/Oportunidade: #StagioWars", "Produto: nome", "Produto: Categoria", "Produto: Subcategoria", "Produto: Quantidade", "Produto: Quantidade de Recorręncia", "Produto: Recorręncia", "Nş do TCE ou Contrato"}),
+    #"Tipo Alterado" = Table.TransformColumnTypes(#"Valor Substituído2",{{"Nş do TCE ou Contrato", Int64.Type}}),
+    #"Erros Substituídos" = Table.ReplaceErrorValues(#"Tipo Alterado", {{"Nş do TCE ou Contrato", 0}}),
+    #"Valor Substituído3" = Table.ReplaceValue(#"Erros Substituídos","ă","ã",Replacer.ReplaceValue,{"Consideraçőes de perda", "Contato", "Contato: CNPJ", "Contato: ID", "Contato: CPF", "Código da Oportunidade", "Data criaçăo", "Fase", "Fechamento", "Funil", "Funil: etapa", "Nome", "Origem", "Responsável", "Valor mensal (MRR)", "Valor total", "Valor único", "Contato:SEGMENTO", "Contato:PORTE", "Motivos ganho/perda", "Sub-motivos de ganho/perda", "Tag Cliente/Oportunidade: #M/Inove+Digital", "Tag Cliente/Oportunidade: #M/2205CasaPos", "Tag Cliente/Oportunidade: #M/2206CasaTalentos", "Tag Cliente/Oportunidade: #M/2206Talentos", "Tag Cliente/Oportunidade: #M/2205Pos", "Tag Cliente/Oportunidade: #LICITAÇĂO", "Tag Cliente/Oportunidade: #M/2206FNC", "Tag Cliente/Oportunidade: #M/2208InoveConst", "Tag Cliente/Oportunidade: #LACASA", "Tag Cliente/Oportunidade: #M/2207CampanhaOFF", "Tag Cliente/Oportunidade: #Inove+Obra", "Tag Cliente/Oportunidade: #StagioWars", "Produto: nome", "Produto: Categoria", "Produto: Subcategoria", "Produto: Quantidade", "Produto: Quantidade de Recorręncia", "Produto: Recorręncia", "Nş do TCE ou Contrato"}),
+    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Valor Substituído3",{{"Fechamento", type date}, {"Data criaçăo", type date}}),
+    #"Personalização Adicionada" = Table.AddColumn(#"Tipo Alterado1", "Data criação-Data fechamento", each Duration.Days([Fechamento]-[Data criaçăo])),
+    #"Colunas Renomeadas" = Table.RenameColumns(#"Personalização Adicionada",{{"Data criaçăo", "Data criação"}}),
+    #"Personalização Adicionada1" = Table.AddColumn(#"Colunas Renomeadas", "Idade Oportunidade", each Duration.Days(Date.From(DateTime.LocalNow()) - [Data criação])),
+    #"Colunas Renomeadas1" = Table.RenameColumns(#"Personalização Adicionada1",{{"Produto: Quantidade de Recorręncia", "Produto: Quantidade de Recorrência"}}),
+    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Colunas Renomeadas1",{{"Produto: Quantidade de Recorrência", Int64.Type}, {"Idade Oportunidade", Int64.Type}}),
+    #"Valor Substituído4" = Table.ReplaceValue(#"Tipo Alterado2","QUALIFICAÇĂO","QUALIFICAÇÃO",Replacer.ReplaceText,{"Funil: etapa"}),
+    #"Valor Substituído5" = Table.ReplaceValue(#"Valor Substituído4","NEGOCIAÇĂO","NEGOCIAÇÃO",Replacer.ReplaceText,{"Funil: etapa"}), 
+    #"Valor Substituído6" = Table.ReplaceValue(#"Valor Substituído5",".",",",Replacer.ReplaceText,{"Valor mensal (MRR)"}),
+    #"Tipo Alterado3" = Table.TransformColumnTypes(#"Valor Substituído6",{{"Valor mensal (MRR)", type number}})
+in
+    #"Tipo Alterado3"
