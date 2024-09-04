@@ -1,0 +1,307 @@
+<div class='card-container'>
+    <!-- Container principal que engloba todos os componentes da página -->
+    <div class='accordion'>
+        <!-- Adiciona o estilo da fonte Material Icons -->
+        <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons:FILL'>
+        <!-- Título principal dos KPIs -->
+        <p class='title'>Marketing KPIs</p>
+
+        <!-- Primeiro item do accordion -->
+        <div class='accordion-item'>
+            <!-- Checkbox para controlar a expansão/colapso do conteúdo -->
+            <input type='checkbox' id='accordion-1' name='accordion'>
+            <!-- Cabeçalho do accordion com título e ícone de expansão -->
+            <label for='accordion-1' class='accordion-header'>
+                Painel Sindicatos <span class='material-icons'>expand_less</span>
+            </label>
+            <!-- Conteúdo expansível do accordion -->
+            <div class='accordion-content'>
+                <!-- Card especial que contém um hyperlink -->
+                <div class='kpi-cards special-card centered'>
+                <div >
+                    <a href='https://app.powerbi.com/view?r=eyJrIjoiNjBiZTZmMzYtZDM4MC00MWFkLTkzMjQtYzExZGY3NDdlZTFmIiwidCI6Ijk4YTNmZjI0LTI0NDgtNDk3Zi1hZjJkLTFiZThjZjlmMGM2OCJ9'
+                        class='kpi-link'>
+                        <strong>Acessar Painel Sindicatos</strong>
+                      </div>
+                    </a>
+                </div class='kpi-cards'>
+                       <div class='card-content-inline'>
+                        <p><b>Fonte</b></p>
+                       <p>Receita Federal</p>
+                        <p>Data de Atualziação</p>
+                        <p>27/08/2024</p>
+              </div>        
+                       
+                
+                    <div class='kpi-cards'>
+                        <strong>Descrição</strong>
+                        <p>
+                            O sindicalismo é um movimento social e político que busca a organização dos trabalhadores em
+                            sindicatos para proteger e promover seus interesses e direitos. É uma forma de representação
+                            coletiva dos trabalhadores, com o objetivo de melhorar as condições de trabalho, negociar
+                            salários e benefícios, e lutar por direitos laborais.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Segundo item do accordion (pode seguir o mesmo padrão) -->
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-2' name='accordion'>
+            <label for='accordion-2' class='accordion-header'>
+                ROI em publicidade <span class='material-icons'>expand_less</span>
+            </label>
+            <div class='accordion-content'>
+                <div class='kpi-cards'>
+                    <strong>Investimento</strong>
+                    <p>R$ 5.000</p>
+                </div>
+                <div class='kpi-cards'>
+                    <strong>Vendas</strong>
+                    <p>R$ 14.890</p>
+                </div>
+                <div class='kpi-cards'>
+                    <strong>ROI</strong>
+                    <p>197,8%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terceiro item do accordion (pode seguir o mesmo padrão) -->
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-3' name='accordion'>
+            <label for='accordion-3' class='accordion-header'>
+                Taxa de conversão Web <span class='material-icons'>expand_less</span>
+            </label>
+            <div class='accordion-content'>
+                <div class='kpi-cards'>
+                    <strong>Visitas</strong>
+                    <p>9.348</p>
+                </div>
+                <div class='kpi-cards'>
+                    <strong>Compras</strong>
+                    <p>890</p>
+                </div>
+                <div class='kpi-cards'>
+                    <strong>Taxa de conversão</strong>
+                    <p>9%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+          /* Importa a fonte 'Inter' do Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+/* Aplica configurações gerais a todos os elementos */
+* {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Container principal que envolve o accordion */
+.card-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    height: 100%;
+    width: 100%;
+}
+
+/* Estilo para o accordion (grupo de itens expansíveis) */
+.accordion {
+    margin: .2rem 0;
+    width: 100%;
+}
+
+/* Estilo do título principal */
+.title {
+    margin: .5rem;
+    color: #727272;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Container de cada item do accordion */
+.accordion-item {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 99.5%;
+}
+
+/* Estilo do cabeçalho de cada item do accordion */
+.accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: linear-gradient(45deg, #fafafa, #fdfdfd);
+    color: #44d;
+    border: 1px solid rgba(100, 100, 100, .2);
+    font-weight: bold;
+    font-size: 0.875rem;
+    text-align: center;
+    padding: .5rem .7rem;
+    margin: .1rem;
+    border-radius: 6px;
+    width: 100%;
+}
+
+/* Efeito de hover no cabeçalho do accordion */
+.accordion-header:hover {
+    transition: 350ms;
+    color: white;
+    background: #44f;
+}
+
+/* Ajusta o ícone de expansão no cabeçalho do accordion */
+.material-icons {
+    margin-left: 8px;
+}
+
+/* Estilo do conteúdo expansível de cada item do accordion */
+.accordion-content {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    transition: height 300ms ease;
+    margin: 0 .2rem;
+    padding: 0 .2rem;
+    border-radius: 5px;
+}
+
+
+/* Estilo padrão para os cards de KPI */
+.kpi-cards {
+    display: flex;
+    flex-direction: column;
+    /* Organiza o conteúdo do card em colunas */
+    justify-content: center;
+    flex-wrap: wrap;
+    background: linear-gradient(45deg, #ffffff, #f3f3f3);
+    color: black;
+    flex: 1;
+    min-width: 150px;
+    height: auto;
+    /* Permite altura dinâmica baseada no conteúdo */
+    margin: .2rem;
+    padding: 20px;
+    text-align: center;
+    border-radius: 6px;
+    box-shadow: 0 0 2px 1px rgba(155, 155, 155, .3);
+    transition: transform 300ms ease, color 300ms ease, background 300ms ease, height 300ms ease;
+}
+.kpi-cards.special-card.centered {
+margin: 1rem; 
+align-self: center; 
+}
+/* Estilo especial para o card com hyperlink */
+.kpi-cards.special-card {
+cursor: pointer;
+width: 350px; /* Largura fixa do card */
+height: 80px; /* Altura fixa do card */
+margin: 0.5rem; /* Espaçamento ao redor do card especial */
+padding: 1rem; /* Padding interno */
+/* Garantir que o card não cresça para preencher o espaço restante */
+flex: 0 0 auto; 
+/* Outros estilos para manter a aparência */
+background: linear-gradient(45deg, #ffffff, #f3f3f3);
+border-radius: 6px;
+box-shadow: 0 0 2px 1px rgba(155, 155, 155, .3);
+transition: transform 300ms ease, color 300ms ease, background 300ms ease, height 300ms ease;
+  
+}
+
+/* Efeito de hover no card especial */
+.kpi-cards.special-card:hover {
+    transform: scale(1.05);
+    background: #44f;
+    color: white;
+}
+
+/* Estilo do link dentro do card especial */
+.kpi-cards.special-card a.kpi-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Estilo do texto forte dentro do card especial */
+.kpi-cards.special-card a.kpi-link strong {
+    font-size: .9rem;
+}
+
+.card-content-inline {
+    flex: 1;
+    min-width: 200px;
+    display: flex;  
+    flex-wrap: wrap;
+    /* Permite quebra de linha se necessário */
+    align-items: center;
+    /* Alinha verticalmente ao centro */
+    justify-content: space-between;
+    width: 100%;
+    padding: 30px;
+    height: auto;
+    /* Permite altura dinâmica baseada no conteúdo */
+    margin: .2rem;
+    text-align: center;
+    border-radius: 6px;
+    box-shadow: 0 0 2px 1px rgba(155, 155, 155, .3);
+    /* Padding interno */
+}
+.card-header {
+text-align: center; /* Centraliza o texto horizontalmente */
+margin-bottom: 0.5rem; /* Espaçamento abaixo do cabeçalho */
+font-weight: bold; /* Destaca o texto */
+}
+
+/* Ajuste de estilo para o texto dentro dos cards inline */
+.card-content-inline p {
+    margin: 0;
+    padding: 0;
+    font-size: .875rem;
+    color: #555;
+    flex: 1;
+    /* Permite que os itens se ajustem igualmente */
+}
+
+/* Oculta os checkboxes */
+input[type='checkbox'] {
+    display: none;
+}
+
+/* Estilo para o conteúdo quando o checkbox está marcado (expande) */
+input[type='checkbox']:checked~.accordion-content {
+    height: 200px;
+    overflow-y: auto;
+    max-height: calc(100vh - 120px);
+}
+
+/* Animação do ícone de expansão ao clicar */
+input[type='checkbox']:checked~.accordion-header span {
+    transform: rotateZ(180deg);
+    transition: 300ms;
+}
+
+/* Estilo para a barra de rolagem em navegadores WebKit (Chrome, Safari) */
+*::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+    background: rgba(221, 221, 221, .7);
+}
+
+/* Estilo para o 'polegar' da barra de rolagem (a parte que se move) */
+*::-webkit-scrollbar-thumb {
+    background: rgba(200, 200, 200, 1);
+    border-radius: 5px;
+}
+</style>
