@@ -1,0 +1,34 @@
+HTM_CSS_Distri_industrial = 
+VAR _NOME= [NM_Distri_industrial]
+VAR _Fonte = [Font_Distri_industrial]
+VAR _DT_Att = [DT_Distri_Industriais]
+VAR _Descr = [Desc_Distri_Industrial]
+Var _Link = [Link_Distri_Indsutrial]
+RETURN
+ "
+ <label for='accordion-2' class='accordion-header'>
+                "&_NOME&" <span class='material-icons'>expand_less</span>
+            </label>
+            <div class='accordion-content'>
+                <div class='kpi-cards special-card centered'>
+                    <div>
+                        <a href="&_Link&" class='kpi-link'>
+                        <strong>Acessar "&_NOME&"</strong>
+                        </a>
+                    </div>
+                </div class='kpi-cards'>
+                <div class='card-content-inline'>
+                    <strong>Fonte:</strong>
+                    <p>"&_Fonte&"</p>
+                    <strong>Periodicidade:</strong>
+                    <p>"&_DT_Att&"</p>
+                </div>
+                <div class='kpi-cards'>
+                    <strong class='fonte'>Descrição</strong>
+                    <p>"&_Descr&"</p>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+ "

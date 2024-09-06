@@ -1,100 +1,34 @@
 <div class='card-container'>
     <div class='accordion'>
         <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons:FILL'>
-        <p class='title'>Marketing KPIs</p>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-0' name='accordion'>
+            "&[HTM_CSS_Acidente_trab]&"
+        </div>
         <div class='accordion-item'>
             <input type='checkbox' id='accordion-1' name='accordion'>
-            <label for='accordion-1' class='accordion-header'>
-                Painel Sindicatos <span class='material-icons'>expand_less</span>
-            </label>
-            <div class='accordion-content'>
-                <div class='kpi-cards special-card centered'>
-                    <div>
-                        <a href='https://app.powerbi.com/view?r=eyJrIjoiNjBiZTZmMzYtZDM4MC00MWFkLTkzMjQtYzExZGY3NDdlZTFmIiwidCI6Ijk4YTNmZjI0LTI0NDgtNDk3Zi1hZjJkLTFiZThjZjlmMGM2OCJ9'
-                            class='kpi-link'>
-                            <strong>Acessar Painel Sindicatos</strong>
-                    </div>
-                    </a>
-                </div class='kpi-cards'>
-
-                <div class='card-content-inline'>
-                    <div class='fonte-group'>
-                        <div class='fonte-header'>
-                            <strong class='fonte'>Fonte</strong>
-                        </div>
-                        <div class='fonte-details'>
-                            <p>Receita Federal</p>
-                            <p>Data de Atualização</p>
-                            <p>27/08/2024</p>
-                        </div>
-                    </div>
-                    <div class='fonte-group'>
-                        <div class='fonte-details'>
-                            <p>Receita 2 Federal</p>
-                            <p>Data de Atualização</p>
-                            <p>27/08/2024</p>
-                        </div>
-                    </div>
-                </div>
-
-
-
-                <div class='kpi-cards'>
-                    <div class='fonte-header'>
-                        <strong class='fonte'>Descrição</strong>
-                    </div>
-                    <p>
-                        O sindicalismo é um movimento social e político que busca a organização dos trabalhadores em
-                        sindicatos para proteger e promover seus interesses e direitos. É uma forma de representação
-                        coletiva dos trabalhadores, com o objetivo de melhorar as condições de trabalho, negociar
-                        salários e benefícios, e lutar por direitos laborais.
-                    </p>
-                </div>
-            </div>
+            "&[HTM_CSS_Comercio_ex]&"
         </div>
-    </div>
-    <div class='accordion-item'>
-        <input type='checkbox' id='accordion-2' name='accordion'>
-        <label for='accordion-2' class='accordion-header'>
-            ROI em publicidade <span class='material-icons'>expand_less</span>
-        </label>
-        <div class='accordion-content'>
-            <div class='kpi-cards'>
-                <strong>Investimento</strong>
-                <p>R$ 5.000</p>
-            </div>
-            <div class='kpi-cards'>
-                <strong>Vendas</strong>
-                <p>R$ 14.890</p>
-            </div>
-            <div class='kpi-cards'>
-                <strong>ROI</strong>
-                <p>197,8%</p>
-            </div>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-2' name='accordion'>
+            "&[HTM_CSS_Distri_industrial]&"
         </div>
-    </div>
-    <div class='accordion-item'>
-        <input type='checkbox' id='accordion-3' name='accordion'>
-        <label for='accordion-3' class='accordion-header'>
-            Taxa de conversão Web <span class='material-icons'>expand_less</span>
-        </label>
-        <div class='accordion-content'>
-            <div class='kpi-cards'>
-                <strong>Visitas</strong>
-                <p>9.348</p>
-            </div>
-            <div class='kpi-cards'>
-                <strong>Compras</strong>
-                <p>890</p>
-            </div>
-            <div class='kpi-cards'>
-                <strong>Taxa de conversão</strong>
-                <p>9%</p>
-            </div>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-3' name='accordion'>
+            "&[HTM_CSS_Empregos_estab]&"
         </div>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-4' name='accordion'>
+            "&[HTM_CSS_IFC]&"
+        </div>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-9' name='accordion'>
+            "&[HTM_CSS_P_Sindicatos]&"
+        </div>
+
     </div>
 </div>
-</div>
+
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
@@ -166,7 +100,8 @@
         width: 100%;
         height: 0;
         overflow: hidden;
-        transition: height 300ms ease;
+        max-height: 0;
+        transition: max-height 500ms ease-in-out;
         margin: 0 .2rem;
         padding: 0 .2rem;
         border-radius: 5px;
@@ -179,7 +114,7 @@
         flex-wrap: wrap;
         background: white;
         color: black;
-        flex: 2;
+        flex: 2.5;
         min-width: 150px;
         height: auto;
         margin: .2rem;
@@ -197,7 +132,7 @@
 
     .kpi-cards.special-card {
         cursor: pointer;
-        width: auto;
+        width: 250px;
         height: 80px;
         min-width: 150px;
         max-width: 50%;
@@ -230,10 +165,9 @@
         display: flex;
         justify-content: Center;
         align-items: center;
-        flex-direction: column;
+        flex-direction: row;
         width: 100%;
         flex-wrap: wrap;
-        position: relative;
         text-align: center;
         flex: 1;
         min-width: 150px;
@@ -250,16 +184,19 @@
     .fonte-group {
         display: flex;
         flex-direction: column;
+        justify-content: Center;
+        align-items: center;
         width: 100%;
         margin-bottom: 20px;
     }
 
     .card-content-inline p {
-        margin: 0;
-        padding: 0;
-        font-size: .9rem;
-        color: black;
-        flex: 1;
+        display: flex;
+        margin: .2rem;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
     }
 
     .fonte-header {
@@ -276,7 +213,8 @@
     .fonte-details {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: center;
+        align-items: center;
         width: 100%;
     }
 
@@ -297,7 +235,7 @@
     }
 
     input[type='checkbox']:checked~.accordion-content {
-        height: 200px;
+        height: auto;
         overflow-y: auto;
         max-height: calc(100vh - 120px);
     }
