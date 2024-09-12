@@ -1,0 +1,10 @@
+Representavidade = 
+VAR _Vendas_absolutas = CALCULATE(
+    [Total de Vendas Faturado],
+    ALL(MBO_FATURAMENTO),  
+    FILTER(ALL(Calendario), Calendario[AnoNomeAtual] = SELECTEDVALUE(Calendario[AnoNomeAtual])),
+    FILTER(ALL(Calendario), Calendario[MesNomeAtual] = SELECTEDVALUE(Calendario[MesNomeAtual])) 
+)
+Var _Div = DIVIDE([Total de Vendas Faturado],_Vendas_absolutas)
+RETURN
+_Div
