@@ -1,0 +1,19 @@
+TESTE mETA = 
+
+VAR _mes = SELECTEDVALUE(Calendario[MesNum])  
+VAR _NRMETA = SELECTEDVALUE(MBO_CAMPANHAS[NR_META])
+RETURN
+    SWITCH(
+        TRUE(),
+         ISBLANK(_NRMETA) || _NRMETA = _mes, 
+            CALCULATE(
+                SUM(MBO_CAMPANHAS[VL_META]),
+                FILTER(MBO_CAMPANHAS, MBO_CAMPANHAS[NR_META] = _mes)
+            ),
+        _NRMETA <> _mes,
+            CALCULATE(
+                SUM(MBO_CAMPANHAS[VL_META]),
+                FILTER(MBO_CAMPANHAS, MBO_CAMPANHAS[NR_META] <> _mes)
+            ),
+        BLANK() 
+    )

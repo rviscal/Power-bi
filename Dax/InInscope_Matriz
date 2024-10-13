@@ -1,0 +1,35 @@
+Esse retoprno tem como função vc alterar a forma com que a Matriz quebra, no caso esta fazendo a media da divião 
+
+Lembrando de sempre passar dentro do IF a medida aplicada acima 
+
+VAR _PROD = ISINSCOPE(MBO_PRODUTOS[descricao])
+VAR _COND_PROD =
+    IF(
+        _PROD,
+        _DIV,  
+        AVERAGEX(
+            VALUES(MBO_PRODUTOS[descricao]), 
+            DIVIDE(([Valor Ajustado Inventario]*-1) + [Total Transferido], [Total De Vendas])
+        )
+    )
+
+    
+
+    VAR _Meta = SUM('METAS BETONEIRAS'[METRO X HORAS])
+VAR _COND = 
+    IF(
+        ISINSCOPE(dBetoneiras[cod_betoneira]),
+        _Meta,
+        AVERAGEX(
+            VALUES(dBetoneiras[cod_betoneira]),
+            CALCULATE(
+                SUM('METAS BETONEIRAS'[METRO X HORAS])        
+            )
+        )
+    )
+
+RETURN
+_COND
+
+184
+209
