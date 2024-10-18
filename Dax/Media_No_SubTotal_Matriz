@@ -1,0 +1,39 @@
+Medida para cada nivel da Matriz, 
+esse medida vc tem que fazer uma parada cada nivel, se tiver 2 3 4 niveis tem que passar tabela,coluna,e a medida, sempre lembrado que vc deve fazer do primeiro ao ultimo nivel 
+colocando medida de cada nivel 
+Exeplo, 
+
+
+        Nivel 2
+            Medida Segundo Nivel, Ela vai trazer Media do Primeiro Nivel Por isso passamos Tabele do Primeiro Nivel e a Coluna de codigo
+
+                Margem CMV  Familia = 
+                VAR TabRupPorLoja = SUMMARIZE(MBO_PRODUTOS,MBO_PRODUTOS[cod_departamento],"%Margem",[Margem CMV DPT])
+                VAR MediaGeral = AVERAGEX(TabRupPorLoja,[%Margem])
+                RETURN
+                MediaGeral
+
+            Nivel 1
+                Medida Primeiro Nivel , essa medida e a oridigal primeira para chegar no primeiro %
+
+                    Margem CMV Prod = 
+                    VAR Margem = DIVIDE([Total De Vendas] - [Custo CMV Produto],[Total De Vendas])
+                    RETURN Margem
+
+
+Media Total 
+
+    Essa Medida e responsavel para fazer junção de todas Medidas, usando condicional quando cada nivel for chamado ele vai chamar cada medida respectiva 
+    
+        % Perda Total = 
+        VAR _COND_PROD = 
+                SWITCH(
+                        TRUE(),
+                        ISINSCOPE(MBO_FILIAL[empDescricao]),[% Perda Filial],
+                        ISINSCOPE(MBO_PRODUTOS[desc_familia]),[% Perda Familia],
+                        ISINSCOPE(MBO_PRODUTOS[desc_departamento]),[% Perda DPT],
+                        ISINSCOPE(MBO_PRODUTOS[descricao]),[% Perda Prod],
+                        [% Perda Geral]
+                        )   
+        RETURN
+        _COND_PROD
