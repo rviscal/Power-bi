@@ -1,0 +1,12 @@
+Condicional_Meta_Batida = 
+SWITCH(
+    TRUE(),
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Vendas" && [%VL_Venda_Meta] >= 1, "Sim",
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Vendas" && [%VL_Venda_Meta] < 1, "Não",
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Cliente" && [%_Qt_Cliente_Meta] >= 1, "Sim",
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Cliente" && [%_Qt_Cliente_Meta] < 1, "Não",
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Produto" && [%_Qt_Produto_Meta] >= 1, "Sim",
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Produto" && [%_Qt_Produto_Meta] < 1, "Não",
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Troca" && [%_Qt_Troca_meta] >= 1, "Não",
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Troca" && [%_Qt_Troca_meta] < 1, "Sim"
+)

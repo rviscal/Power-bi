@@ -1,0 +1,22 @@
+Primeiro 
+
+Deve criar tb_Categoria ( Lembrando que cada categoria e Subcategoria e a gosto altere da forma que desejar)
+
+Criar Medida (Calculo_geral_Matriz)
+
+Essa medida e onde vc vai referenciar cada Subcategoria com sua tabela, lembrando que os valores vão sem formatação por isso na medida alguns valores foram formatados 
+
+Após feito as duas medidas vc colocas as Linhas 
+
+no Caso foi RCA e Supervisr
+
+Nas colunas coloque Categoria e a Subcategoria, 
+
+e nos valores sua medida Calculo_geral_Matriz
+
+Após isso vc vai ter provavelmente matriz vazia vc pede para expandir toda e vai aparecer os dados, 
+
+
+Para condicional das % use a Medida Condiciona_meta 
+ao adiciona ICone vc seleciona ela e de acordo com criterio que vc definil nela vc passa e o Icone sera criado 
+

@@ -1,0 +1,21 @@
+Realizado_Geral_Matriz2 = 
+SWITCH(
+    TRUE(),
+    SELECTEDVALUE(Categorias[Subcategoria]) = "Realizado Vendas" && NOT(ISBLANK([Total de Vendas Blank])), FORMAT([Total de Vendas Blank], "R$ #,0.00;-R$ #,0.00;R$ #,0.00"),
+    SELECTEDVALUE(Categorias[Subcategoria]) = "Meta Vendas" && NOT(ISBLANK([Total Meta Sem Geral InSCOPE])), FORMAT([Total Meta Sem Geral InSCOPE], "R$ #,0.00;-R$ #,0.00;R$ #,0.00"),
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Vendas" && NOT(ISBLANK([%VL_Venda_Meta])), FORMAT([%VL_Venda_Meta], "00.00%"),
+    SELECTEDVALUE(Categorias[Subcategoria]) = "Tendência" && NOT(ISBLANK([Tendencia_Blank])), FORMAT([Tendencia_Blank], "R$ #,0.00;-R$ #,0.00;R$ #,0.00"),
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Cliente" && NOT(ISBLANK([%_Qt_Cliente_Meta])), FORMAT([%_Qt_Cliente_Meta], "00.00%"),
+    SELECTEDVALUE(Categorias[Subcategoria]) = "Realizado Clientes" && NOT(ISBLANK([Qtd. Clientes Faturamento])), [Qtd. Clientes Faturamento],
+    SELECTEDVALUE(Categorias[Subcategoria]) = "Meta Clientes" && NOT(ISBLANK([Qtd. Clientes Meta])), [Qtd. Clientes Meta],
+    SELECTEDVALUE(Categorias[Subcategoria]) = "Produtos Positivados" && NOT(ISBLANK([Qtd. Produto Faturamento])), [Qtd. Produto Faturamento],
+    SELECTEDVALUE(Categorias[Subcategoria]) = "Meta Produtos" && NOT(ISBLANK([Qt_Produto_Meta])), [Qt_Produto_Meta],
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Produto" && NOT(ISBLANK([%_Qt_Produto_Meta])), FORMAT([%_Qt_Produto_Meta], "0.00%"),
+    SELECTEDVALUE(Categorias[Subcategoria]) = "Qtd. Produtos un." && NOT(ISBLANK([Total Quantidade Vendida un.])), [Total Quantidade Vendida un.],
+    SELECTEDVALUE(Categorias[Subcategoria]) = "Realizado Troca" && NOT(ISBLANK([Qtd. Troca Real])), [Qtd. Troca Real],
+    SELECTEDVALUE(Categorias[Subcategoria]) = "Meta Troca" && NOT(ISBLANK([Qtd. Troca Meta])), [Qtd. Troca Meta],
+    SELECTEDVALUE(Categorias[Subcategoria]) = "% Troca" && NOT(ISBLANK([%_Qt_Troca_meta])), FORMAT([%_Qt_Troca_meta], "0.00%"),
+    SELECTEDVALUE(Categorias[Subcategoria]) = "DT. Iinicio Virgência" && NOT(ISBLANK([DT_Inicio_Campanha])), [DT_Inicio_Campanha],
+    SELECTEDVALUE(Categorias[Subcategoria]) = "DT. Fim Virgência" && NOT(ISBLANK([DT_Inicio_Campanha])), [DT_Inicio_Campanha],
+    BLANK()
+)
