@@ -1,0 +1,6 @@
+() =>
+let
+    Query = "SELECT
+              "
+in
+    Query

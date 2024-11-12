@@ -1,0 +1,13 @@
+ColunaValor1 = 
+Var _MesAnt = CALCULATE( [Total De Vendas], DATEADD( Calendario[Data], -1, MONTH) ) // Variável responsável por chamar o mês passado
+Var trimestre = CALCULATE( [Total De Vendas], DATEADD( Calendario[Data], -1, QUARTER) ) // Variável responsável por chamar o trimestre passado
+Var AnoAnt = CALCULATE( [Total De Vendas], DATEADD( Calendario[Data], -1, YEAR) ) // Variável responsável por chamar valores do ano passado 
+RETURN 
+    SWITCH(
+        TRUE(),
+        ISINSCOPE( Calendario[Nome_Mes] ), 
+            DIVIDE( [Total De Vendas] - _MesAnt, _MesAnt), // Calcula a variação em relação ao mês passado se o contexto for de mês
+        ISINSCOPE( Calendario[Trimestre] ),
+            DIVIDE( [Total De Vendas] - trimestre, trimestre), // Calcula a variação em relação ao trimestre passado se o contexto for de trimestre
+        DIVIDE( [Total De Vendas] - AnoAnt, AnoAnt) // Calcula a variação em relação ao ano passado se o contexto for anual
+    )

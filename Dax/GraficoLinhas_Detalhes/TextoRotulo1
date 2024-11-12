@@ -1,0 +1,7 @@
+TextoRotulo1 = 
+    SWITCH(
+        TRUE(),
+        ISINSCOPE(Calendario[Nome_Mes]), "Δ% PM", // Se o contexto for Nome_Mes, retorna "Δ% PM"
+        ISINSCOPE(Calendario[Trimestre]), "Δ% PQ", // Se o contexto for Trimestre, retorna "Δ% PQ"
+        "Δ% PY" // Caso contrário, retorna "Δ% PY"
+    )

@@ -1,0 +1,295 @@
+CSS_Drilldown = 
+
+
+ "
+<div class='card-container'>
+    <div class='accordion'>
+        <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons:FILL'>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-0' name='accordion'>
+            "&[HTM_CSS_Acidente_trab]&"
+        </div>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-1' name='accordion'>
+            "&[HTM_CSS_Comercio_ex]&"
+        </div>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-2' name='accordion'>
+            "&[HTM_CSS_Distri_industrial]&"
+        </div>
+         <div class='accordion-item'>
+            <input type='checkbox' id='accordion-3' name='accordion'>
+            "&[HTM_CSS_Empregos_estab]&"
+        </div>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-4' name='accordion'>
+            "&[HTM_CSS_IFC]&"
+        </div>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-5' name='accordion'>
+            "&[HTM_CSS_Panorama_Economico]&"
+        </div>
+         <div class='accordion-item'>
+            <input type='checkbox' id='accordion-6' name='accordion'>
+            "&[HTM_CSS_Perfil_Municipio]&"
+        </div>
+            <div class='accordion-item'>
+            <input type='checkbox' id='accordion-7' name='accordion'>
+            "&[HTM_CSS_Pn_Gestao]&"
+        </div>
+         </div>
+            <div class='accordion-item'>
+            <input type='checkbox' id='accordion-8' name='accordion'>
+            "&[HTM_CSS_Pn_Educacao]&"
+        </div>
+         </div>
+            <div class='accordion-item'>
+            <input type='checkbox' id='accordion-9' name='accordion'>
+            "&[HTM_CSS_Pn_Mineracao]&"
+        </div>
+        </div>
+            <div class='accordion-item'>
+            <input type='checkbox' id='accordion-10' name='accordion'>
+            "&[HTM_CSS_Saude]&"
+        </div>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-11' name='accordion'>
+            "&[HTM_CSS_P_Sindicatos]&"
+        </div>
+        <div class='accordion-item'>
+            <input type='checkbox' id='accordion-12' name='accordion'>
+            "&[HTM_CSS_Saldo_Empregos]&"
+        </div>
+        
+    </div>
+</div>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+    * {
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .card-container {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        height: 100%;
+        width: 100%;
+    }
+
+    .accordion {
+        margin: .2rem 0;
+        width: 100%;
+    }
+
+    .title {
+        margin: .5rem;
+        color: #727272;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .accordion-item {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        width: 99.5%;
+    }
+
+    .accordion-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        background: linear-gradient(45deg, #fafafa, #fdfdfd);
+        color: #23325f;
+        border: 1px solid rgba(100, 100, 100, .2);
+        font-weight: bold;
+        font-size: 1.5rem;
+        text-align: center;
+        padding: .5rem .7rem;
+        margin: .1rem;
+        border-radius: 6px;
+        width: 100%;
+    }
+
+    .accordion-header:hover {
+        transition: 350ms;
+        color: white;
+        background: #23325f;
+    }
+
+    .material-icons {
+        margin-left: 8px;
+    }
+
+    .accordion-content {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+        height: 0;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 500ms ease-in-out;
+        margin: 0 .2rem;
+        padding: 0 .2rem;
+        border-radius: 5px;
+    }
+
+    .kpi-cards {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-wrap: wrap;
+        background: white;
+        color: black;
+        flex: 2.5;
+        min-width: 150px;
+        height: auto;
+        margin: .2rem;
+        padding: 20px;
+        text-align: center;
+        border-radius: 6px;
+        box-shadow: 0 0 2px 1px rgba(155, 155, 155, .3);
+        transition: transform 300ms ease, color 300ms ease, background 300ms ease, height 300ms ease;
+    }
+
+    .kpi-cards.special-card.centered {
+        margin: 1rem;
+        align-self: center;
+    }
+
+    .kpi-cards.special-card {
+        cursor: pointer;
+        width: 250px;
+        height: 80px;
+        min-width: 150px;
+        max-width: 50%;
+        margin: 0.5rem;
+        padding: 1rem;
+        flex: 0.3 1 auto;
+        background: linear-gradient(45deg, #23325f, #4e629d);
+        border-radius: 6px;
+        box-shadow: 0 0 2px 1px rgba(155, 155, 155, .3);
+        transition: transform 300ms ease, color 300ms ease, background 300ms ease, height 300ms ease;
+        color: white;
+    }
+
+    .kpi-cards.special-card:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #23325f, #4e629d);
+        color: white;
+    }
+
+    .kpi-cards.special-card a.kpi-link {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .kpi-cards.special-card a.kpi-link strong {
+        font-size: 1.2rem;
+    }
+
+    .card-content-inline {
+        display: flex;
+        justify-content: Center;
+        align-items: center;
+        flex-direction: row;
+        width: 100%;
+        flex-wrap: wrap;
+        text-align: center;
+        flex: 1;
+        min-width: 150px;
+        height: auto;
+        margin: .2rem;
+        padding: 20px;
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 0 2px 1px rgba(155, 155, 155, .3);
+        transition: transform 300ms ease, color 300ms ease, background 300ms ease, height 300ms ease;
+
+    }
+
+    .fonte-group {
+        display: flex;
+        flex-direction: column;
+        justify-content: Center;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .card-content-inline p {
+        display: flex;
+        margin: .2rem;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .fonte-header {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .fonte {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .fonte-details {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .fonte-details p {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .card-header {
+        text-align: center;/ margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+
+
+
+    input[type='checkbox'] {
+        display: none;
+    }
+
+    input[type='checkbox']:checked~.accordion-content {
+        height:auto;
+        overflow-y: auto;
+        max-height: calc(100vh - 120px);
+    }
+
+    input[type='checkbox']:checked~.accordion-header span {
+        transform: rotateZ(180deg);
+        transition: 300ms;
+    }
+
+    *::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+        background: rgba(221, 221, 221, .7);
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background: rgba(200, 200, 200, 1);
+        border-radius: 5px;
+    }
+</style>
+
+"

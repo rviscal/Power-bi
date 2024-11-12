@@ -1,0 +1,1 @@
+LinhaVazia = IF( [Total De Vendas] <> 0 || [Posicao_Rotulo1] <> 0, -1.5 ) // Verifica se Total De Vendas ou Posicao_Rotulo1 não são zero, e retorna -1.5

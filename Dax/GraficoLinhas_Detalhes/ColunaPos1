@@ -1,0 +1,3 @@
+Essa medida tem como função vc criar os quadrados embaixo do Grafico
+
+IF( [Total De Vendas] <> 0 , -1 )

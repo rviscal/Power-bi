@@ -1,0 +1,2 @@
+Essa medida tem como função insrir os quadrados inferiores
+IF( [Total De Vendas] <> 0  , -1 )

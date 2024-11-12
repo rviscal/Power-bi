@@ -1,0 +1,6 @@
+let
+   Fonte = 
+   Oracle.Database("201.157.240.39/CF7OX1_167626_W" \\ Aqui inserir o tipo do DB, ip,e o Schema , 
+   [HierarchicalNavigation=true, Query=fn_QueryProduto()// Aqui vc chama a função com select])
+in
+   Fonte

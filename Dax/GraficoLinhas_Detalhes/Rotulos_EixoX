@@ -1,0 +1,7 @@
+Rotulos_EixoX = 
+SWITCH(
+    TRUE(),
+    ISINSCOPE(Calendario[Nome_Mes]) && [Total De Vendas] <> 0, MIN(Calendario[Nome_Mes]), // Se o contexto for Nome_Mes e Total De Vendas não for zero, retorna o menor Nome_Mes
+    ISINSCOPE(Calendario[Trimestre]) && [Total De Vendas] <> 0, MIN(Calendario[Trimestre]), // Se o contexto for Trimestre e Total De Vendas não for zero, retorna o menor Trimestre
+    ISINSCOPE(Calendario[Ano]) && [Total De Vendas] <> 0, MIN(Calendario[Ano]) // Se o contexto for Ano e Total De Vendas não for zero, retorna o menor Ano
+)

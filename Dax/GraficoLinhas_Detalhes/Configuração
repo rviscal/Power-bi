@@ -1,0 +1,56 @@
+Claro! Vamos detalhar todas as etapas para configurar o gráfico detalhado de linhas no Power BI com clareza, mantendo todas as informações essenciais.
+
+### Passo a Passo para Configurar o Gráfico Detalhado de Linhas
+
+1. **Tipo de Gráfico**:
+   - Selecione **Gráfico de Colunas Empilhadas e Linhas** (Line and Stacked Column Chart).
+
+2. **Escolha do Período**:
+   - Decida qual período deseja trabalhar (Ano, Trimestre, Mês) e insira todos esses períodos nos cálculos.
+   - Vamos usar os campos de Ano, Trimestre e Mês da tabela `Calendario`.
+
+3. **Configuração do Eixo X**:
+   - Insira os campos de tempo (Ano, Trimestre, Mês) no eixo X na ordem desejada.
+
+4. **Configuração do Eixo Y**:
+   - Insira inicialmente as medidas `ColunaPos1` e `ColunaPos2`.
+
+5. **Linha do Eixo Y**:
+   - Insira sua medida de vendas, por exemplo, `Total De Vendas`.
+
+6. **Ajustes Visuais (Parte de Visual)**:
+   - **Eixo Y**:
+     - Ajuste a escala do eixo Y até que os quadrados fiquem no tamanho ideal, em torno de 6. Faça seus testes para encontrar o ajuste perfeito.
+   - **Colunas**:
+     - Selecione uma medida de cada vez, retire o fundo e adicione borda.
+     - Selecione todas as medidas, vá em Layout e aumente o espaço máximo entre séries, ajustando conforme necessário o espaçamento entre categorias.
+   - **Rótulo de Dados**:
+     - Ative os rótulos de dados.
+     - Selecione `ColunaPos1`, vá em valores, e clique na seta ao lado para selecionar a medida `ColunaValor1`. Repita o processo para `ColunaPos2`, selecionando `ColunaValor2`.
+
+7. **Inserir a Medida `AlturaLina`**:
+   - Insira `AlturaLina` na Linha do Eixo Y.
+   - Ajuste a medida para encaixar melhor no seu visual.
+
+8. **Ocultar a Linha `AlturaLina`**:
+   - No editor de visual, vá em Linhas, selecione `AlturaLina` e desmarque a opção "Mostrar para todas as séries de dados".
+   - Em Rótulos de Dados, selecione a medida `AlturaLina` e desabilite a opção "Mostrar para todas as séries de dados".
+
+9. **Legendas nos Quadrados**:
+   - Insira `Posicao_Rotulo2` e `Posicao_Rotulo1` na Coluna Y na ordem desejada.
+   - Retire o fundo dos quadrados.
+   - Em Rótulos de Dados, ajuste os valores para `TextoRotulo1` e `TextoRotulo2`, mudando o texto dentro do quadrado.
+
+10. **Inserir a Medida `Linha_Vazia`**:
+   - Insira `Linha_Vazia` nas colunas para colocar os períodos abaixo da linha.
+   - Retire o fundo dos quadrados e não adicione borda.
+   - Em Rótulos de Dados, insira a medida `Linha_Vazia` e ajuste o valor para `Rotulos_EixoX` para retornar os meses.
+
+### Medidas Utilizadas:
+- **Valores Internos dos Quadrados**: `ColunaValor1`, `ColunaValor2`
+- **Legenda dos Quadrados**: `TextoRotulo1`, `TextoRotulo2`
+- **Períodos**: `Rotulos_EixoX`
+
+### Lembretes:
+- As medidas `ColunaPos1`, `ColunaPos2`, `AlturaLina`, `Linha_Vazia`, `Posicao_Rotulo1`, `Posicao_Rotulo2`, `TextoRotulo1`, `TextoRotulo2`, e `Rotulos_EixoX` são essenciais para configurar o gráfico conforme as etapas descritas.
+

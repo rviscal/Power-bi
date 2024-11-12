@@ -1,0 +1,26 @@
+Posicao_Rotulo2 = 
+// Definindo a variável _PrimeiraData para obter a menor data de venda do conjunto de dados selecionado
+VAR _PrimeiraData = CALCULATE(MIN(MBO_FATURAMENTO[DATAVENDA]), ALLSELECTED(Calendario))
+
+// Definindo a variável _DeslocamentoPeriodo para determinar o deslocamento do período com base no contexto atual
+VAR _DeslocamentoPeriodo =
+    SWITCH(
+        TRUE(),
+        ISINSCOPE(Calendario[Nome_Mes]), -1, // Se estiver no escopo do Nome_Mes, o deslocamento é de -1 mês
+        ISINSCOPE(Calendario[Trimestre]), -3, // Se estiver no escopo do Trimestre, o deslocamento é de -3 meses
+        -12 // Caso contrário, o deslocamento é de -12 meses (um ano)
+    )
+
+// Definindo a variável _RotuloPeriodo para calcular o último dia do mês do período deslocado
+VAR _RotuloPeriodo = EOMONTH(_PrimeiraData, _DeslocamentoPeriodo)
+
+// Definindo a variável _Rotulo para verificar se a data mínima e máxima do calendário está dentro do período deslocado
+VAR _Rotulo =
+    IF(
+        MIN(Calendario[Data]) <= _RotuloPeriodo && MAX(Calendario[Data]) >= _RotuloPeriodo,
+        -1 // Se a data mínima e máxima estiverem dentro do período deslocado, retorna -1
+    )
+
+// Retorna o valor de _Rotulo
+RETURN
+    _Rotulo
