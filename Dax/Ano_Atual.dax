@@ -1,0 +1,2 @@
+Coluna Calculada 
+AnoFiltro = IF(Calendario[Ano] = YEAR(TODAY()), "Ano Vigente",CONVERT(Calendario[Ano],STRING))s
