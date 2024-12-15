@@ -1,0 +1,13 @@
+(Text) =>
+let
+    TextToConvert = {"á", "ã", "â", "à", "é", "ê", "í", "ó", "õ", "ô", "ú", "ç", "Á", "Ã", "Â", "À", "É", "Ê", "Í", "Ó", "Õ", "Ô", "Ú", "Ç"},
+    ConvertedText = {"a", "a", "a", "a", "e", "e", "i", "o", "o", "o", "u", "c", "A", "A", "A", "A", "E", "E", "I", "O", "O", "O", "U", "C"},
+    TextFixed = Text,
+    Result = Text.Combine(
+        List.Transform(
+            Text.ToList(TextFixed),
+            each try ConvertedText{List.PositionOf(TextToConvert, _)} otherwise _
+        ), ""
+    )
+in
+    Result
