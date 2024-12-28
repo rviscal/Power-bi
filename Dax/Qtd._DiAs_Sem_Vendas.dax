@@ -1,0 +1,2 @@
+ VAR QtdDias = DATEDIFF(MAX(MBO_FATURAMENTO[datavenda]), TODAY(), DAY)
+                         RETURN IF(ISBLANK([Qtd Dias]),0,QtdDias)
