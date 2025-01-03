@@ -1,6 +1,6 @@
 let
     AnoInicial = 2010,
-    AnoFinal = 2025,
+     AnoFinal = Date.Year(DateTime.LocalNow()),
     //Declara uma data inicial
     DataInicial = Date.StartOfYear(#date(AnoInicial, 1, 1)),
     //Declara uma data final

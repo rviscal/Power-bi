@@ -1,3 +1,8 @@
+Formas de aplixar a função
+
+adicione uma nova coluna deixando tudo em Maiusculo, quando coluna estiver pronta,
+substituia Uper.Text pela função, com o nome que vc deu
+
 (Text) =>
 let
     TextToConvert = {"á", "ã", "â", "à", "é", "ê", "í", "ó", "õ", "ô", "ú", "ç", "Á", "Ã", "Â", "À", "É", "Ê", "Í", "Ó", "Õ", "Ô", "Ú", "Ç"},
