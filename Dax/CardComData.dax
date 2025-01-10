@@ -1,0 +1,5 @@
+PeriodoSelecionado = 
+VAR DataMin = MIN(dCalendario[Data])
+VAR DataMax = MAX(dCalendario[Data])
+RETURN
+    "De " & FORMAT(DataMin, "dd/MM/yyyy") & " até " & FORMAT(DataMax, "dd/MM/yyyy")
