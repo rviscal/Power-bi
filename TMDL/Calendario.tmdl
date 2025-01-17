@@ -1,6 +1,6 @@
 createOrReplace
 
-	table calendario
+	table dim_calendario
 		dataCategory: Time
 
 		column Data

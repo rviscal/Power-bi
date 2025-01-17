@@ -1,0 +1,247 @@
+createOrReplace
+
+	table dim_Periodos
+		dataCategory: Time
+
+        column Data
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Data
+
+            annotation SummarizationSetBy = Automatic
+                    
+        column Hoje
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Hoje
+
+            annotation SummarizationSetBy = Automatic
+
+        column Ontem
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Ontem
+
+            annotation SummarizationSetBy = Automatic
+
+        column EstaSemana
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: EstaSemana
+
+            annotation SummarizationSetBy = Automatic
+
+        column Ultimos7Dias
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Ultimos7Dias
+
+            annotation SummarizationSetBy = Automatic
+
+        column SemanaPassada
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: SemanaPassada
+
+            annotation SummarizationSetBy = Automatic
+
+        column Ultimos15Dias
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Ultimos15Dias
+
+            annotation SummarizationSetBy = Automatic
+
+        column EsseMes
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: EsseMes
+
+            annotation SummarizationSetBy = Automatic
+
+        column Ultimos30Dias
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Ultimos30Dias
+
+            annotation SummarizationSetBy = Automatic
+
+        column MesPassado
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: MesPassado
+
+            annotation SummarizationSetBy = Automatic
+
+        column Ultimos2Meses
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Ultimos2Meses
+
+            annotation SummarizationSetBy = Automatic
+
+        column Ultimos3Meses
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Ultimos3Meses
+
+            annotation SummarizationSetBy = Automatic
+
+        column Ultimos6Meses
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Ultimos6Meses
+
+            annotation SummarizationSetBy = Automatic
+
+        column Ultimos12Meses
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Ultimos12Meses
+
+            annotation SummarizationSetBy = Automatic
+
+        column Ultimos365Dias
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: Ultimos365Dias
+
+            annotation SummarizationSetBy = Automatic
+
+        column EsteAno
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: EsteAno
+
+            annotation SummarizationSetBy = Automatic
+
+        column AnoPassado
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: AnoPassado
+
+            annotation SummarizationSetBy = Automatic
+
+        column DoInicioAteHoje
+            dataType: string
+            formatString: 0
+            summarizeBy: none
+            sourceColumn: DoInicioAteHoje
+
+            annotation SummarizationSetBy = Automatic
+
+        partition dim_calendario = m
+			mode: import
+			source = ```
+            let
+	
+            //Criando minha função encapsulada
+            fnGerarPediodos = (Periodo as text, DataInicial as date, DataFinal as date, Ordem as number) =>
+                let
+                    QtdDias = Duration.Days(DataFinal - DataInicial) + 1,
+                    Datas = List.Dates(DataInicial, QtdDias, #duration(1, 0, 0, 0)),
+                    Cabecalho = type table[Data=date, Periodo=text, Ordem=number],
+                    Lista = List.Transform(
+                        Datas,
+                        each
+                        {
+                            _,
+                            Periodo,
+                            Ordem
+                        }
+                    ),
+                    Tabela = #table(Cabecalho, Lista)
+                in
+                    Tabela,
+            
+            
+                // hoje e ontem
+                
+                DtHoje = DateTime.Date(DateTime.LocalNow()),//Hoje
+                DtOntem = Date.AddDays(DtHoje, -1),//ontem
+                
+                //Semana Atual
+                
+                InicioSemana = Date.StartOfWeek(DtHoje),
+                FimSemana = Date.EndOfWeek(DtHoje),
+                
+                //SemanaPassada - 7 Dias
+                
+                InicioSemanaPassada = Date.AddDays(InicioSemana, -7),
+                FimSemanaPassada = Date.AddDays(FimSemana,-7),
+                
+                // Duas Semanas Antes - 15 Dias 
+                
+                InicioDuasSemanasPassadas = Date.AddDays(InicioSemanaPassada, -7),
+                FimDuasSemanasPassadas = Date.AddDays(FimSemanaPassada, -7),
+                
+                // Mês Atual
+                
+                InicioMes = Date.StartOfMonth(DtHoje),
+                FimMes = Date.EndOfMonth(DtHoje),
+                
+                //Mês Anterior
+                
+                InicioMesAnterior = Date.AddMonths(Date.StartOfMonth(DtHoje), -1),
+                FimMesAnterior = Date.EndOfMonth(InicioMesAnterior),
+                
+                // Este Ano
+                
+                InicioANo = Date.StartOfYear(DtHoje),
+                FimANo = Date.EndOfYear(DtHoje),
+                
+                Intervalos = 
+                
+                    {
+                        {"Hoje", DtHoje,DtHoje,1},
+                        {"Ontem", DtOntem, DtOntem,2},
+                        {"Esta Semana", InicioSemana,FimSemana,3},
+                        {"Ultímos 7 Dias", Date.AddDays(DtHoje,-6),DtHoje,4},
+                        {"Semana Passada", InicioSemanaPassada, FimSemanaPassada,5},
+                        {"Últimos 15 Dias", Date.AddDays(DtHoje, -14),DtHoje,6},
+                        {"Esse Mês", InicioMes, FimMes,7},
+                        {"Últimos 30 Dias", Date.AddDays(DtHoje, -29),DtHoje,8},
+                        {"Mês Passado", InicioMesAnterior,FimMesAnterior,9},
+                        {"Últimos 2 Mêses", Date.StartOfMonth(Date.AddMonths(DtHoje, -2)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 10},
+                        {"Últimos 3 Meses", Date.StartOfMonth(Date.AddMonths(DtHoje, -3)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 11},
+                        {"Últimos 6 Meses", Date.StartOfMonth(Date.AddMonths(DtHoje, -6)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 12},
+                        {"Últimos 12 Meses", Date.StartOfMonth(Date.AddMonths(DtHoje, -12)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 13},
+                        {"Últimos 365 Dias", Date.From(Date.AddDays(DtHoje, -364)), DtHoje, 14},
+                        {"Este Ano", InicioANo,FimANo,15},
+                        {"Ano Passado",Date.AddYears(InicioANo,-1),Date.AddYears(FimANo,-1),16},
+                        {"Do Inicio Ate Hoje", Date.AddYears(InicioANo,-10), DtHoje,17}
+                    },
+                    // Aplicando Então, Nossa Função de Periodos a partir nossa lista movel datas
+                        
+                        Periodos =  List.Transform(
+                        Intervalos,
+                        each
+                        fnGerarPediodos(_{0},_{1},_{2},_{3})
+                        ),
+                // Aplicando Então, Nossa Função de Periodos a partir nossa lista movel datas
+                    Tabela = Table.Combine(Periodos)
+                    in
+                    Tabela
+            
+             ```
+
+            annotation PBI_NavigationStepName = Navigation
+            
+            annotation PBI_ResultType = Table
