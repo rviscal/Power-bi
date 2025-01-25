@@ -1,0 +1,13 @@
+Clientes Novo = 
+ VAR _ClientesAtuais = VALUES(MBO_FATURAMENTO[CODIGOCLIENTE])
+ VAR _CLientesAntigos = 
+                    CALCULATETABLE(
+                        VALUES(MBO_FATURAMENTO[CODIGOCLIENTE]),
+                        FILTER(
+                            ALL(Calendario[Data]),
+                            Calendario[Data] < MIN(Calendario[Data])
+                        )
+                    )
+Var _Novos = EXCEPT(_ClientesAtuais,_CLientesAntigos)
+RETURN
+COUNTROWS(_Novos)
