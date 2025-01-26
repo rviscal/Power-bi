@@ -209,27 +209,29 @@ createOrReplace
                 
                 Intervalos = 
                 
-                    {
-                        {"Hoje", DtHoje,DtHoje,1},
-					    {"Ontem", DtOntem, DtOntem,2},
-					    {"Esta Semana", InicioSemana,FimSemana,3},
-						{"Semana Passada", InicioSemanaPassada, FimSemanaPassada,4},
-					    {"Ultímos 7 Dias", Date.AddDays(DtHoje,-6),DtHoje,5},
-					    {"Últimos 15 Dias", Date.AddDays(DtHoje, -14),DtHoje,6},
-					    {"Últimos 30 Dias", Date.AddDays(DtHoje, -29),DtHoje,7},
-						{"Últimos 60 Dias", Date.AddDays(DtHoje, -59),DtHoje,8},
-						{"Últimos 90 Dias", Date.AddDays(DtHoje, -89),DtHoje,9},
-						{"Esse Mês", InicioMes, FimMes,10},
-					    {"Mês Passado", InicioMesAnterior,FimMesAnterior,11},
-					    {"Últimos 2 Mêses", Date.StartOfMonth(Date.AddMonths(DtHoje, -2)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 12},
-					    {"Últimos 3 Meses", Date.StartOfMonth(Date.AddMonths(DtHoje, -3)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 13},
-					    {"Últimos 6 Meses", Date.StartOfMonth(Date.AddMonths(DtHoje, -6)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 14},
-					    {"Últimos 12 Meses", Date.StartOfMonth(Date.AddMonths(DtHoje, -12)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 15},
-					    {"Últimos 365 Dias", Date.From(Date.AddDays(DtHoje, -364)), DtHoje, 16},
-					    {"Este Ano", InicioANo,FimANo,17},
-					    {"Ano Passado",Date.AddYears(InicioANo,-1),Date.AddYears(FimANo,-1),18},
-					    {"Do Inicio Ate Hoje", Date.AddYears(InicioANo,-10), DtHoje,19}
-                    },
+                {
+                    {"Hoje", DtHoje, DtHoje, 1},
+                    {"Ontem", DtOntem, DtOntem, 2},
+                    {"Esta Semana", InicioSemana, FimSemana, 3},
+                    {"Semana Passada", InicioSemanaPassada, FimSemanaPassada, 4},
+                    {"Últimos 7 Dias", Date.AddDays(DtHoje, -6), DtHoje, 5},
+                    {"Últimos 15 Dias", Date.AddDays(DtHoje, -14), DtHoje, 6},
+                    {"Últimos 30 Dias", Date.AddDays(DtHoje, -29), DtHoje, 7},
+                    {"Últimos 60 Dias", Date.AddDays(DtHoje, -59), DtHoje, 8},
+                    {"Últimos 90 Dias", Date.AddDays(DtHoje, -89), DtHoje, 9},
+                    {"Últimos 180 Dias", Date.AddDays(DtHoje, -179), DtHoje, 10},  
+                    {"Esse Mês", InicioMes, FimMes, 11},
+                    {"Mês Passado", InicioMesAnterior, FimMesAnterior, 12},
+                    {"Últimos 2 Meses", Date.StartOfMonth(Date.AddMonths(DtHoje, -2)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 13},
+                    {"Últimos 3 Meses", Date.StartOfMonth(Date.AddMonths(DtHoje, -3)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 14},
+                    {"Últimos 6 Meses", Date.StartOfMonth(Date.AddMonths(DtHoje, -6)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 15},
+                    {"Últimos 12 Meses", Date.StartOfMonth(Date.AddMonths(DtHoje, -12)), Date.EndOfMonth(Date.AddMonths(DtHoje, -1)), 16},
+                    {"Últimos 365 Dias", Date.From(Date.AddDays(DtHoje, -364)), DtHoje, 17},
+                    {"Este Ano", InicioANo, FimANo, 18},
+                    {"Ano Passado", Date.AddYears(InicioANo, -1), Date.AddYears(FimANo, -1), 19},
+                    {"Do Início Até Hoje", Date.AddYears(InicioANo, -10), DtHoje, 20}
+                }
+                ,
                     // Aplicando Então, Nossa Função de Periodos a partir nossa lista movel datas
                         
                         Periodos =  List.Transform(
