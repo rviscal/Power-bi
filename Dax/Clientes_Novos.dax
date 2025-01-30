@@ -11,3 +11,32 @@ Clientes Novo =
 Var _Novos = EXCEPT(_ClientesAtuais,_CLientesAntigos)
 RETURN
 COUNTROWS(_Novos)
+
+
+
+Versão para saber novos Clientes por vendedor, pois podemos ter varios vededores e 1 cliente incomum entre eles então precisa ser filtrado primeira compra do primeiro vendedor
+Clientes Novos = 
+VAR PrimeiraCompraGlobal = 
+    SUMMARIZE(
+        MBO_FATURAMENTO,
+        MBO_FATURAMENTO[CODIGOCLIENTE],
+        "DataPrimeiraCompra", CALCULATE(MIN(MBO_FATURAMENTO[DATAVENDA]), ALLEXCEPT(MBO_FATURAMENTO, MBO_FATURAMENTO[CODIGOCLIENTE]))
+    )
+
+VAR PrimeiraCompraPorVendedor = 
+    SUMMARIZE(
+        MBO_FATURAMENTO,
+        MBO_FATURAMENTO[CODIGOCLIENTE],
+        MBO_FATURAMENTO[CODRCA],
+        "DataPrimeiraCompraVendedor", CALCULATE(MIN(MBO_FATURAMENTO[DATAVENDA]), ALLEXCEPT(MBO_FATURAMENTO, MBO_FATURAMENTO[CODIGOCLIENTE], MBO_FATURAMENTO[CODRCA]))
+    )
+
+VAR ClientesFiltrados = 
+    FILTER(
+        NATURALINNERJOIN(PrimeiraCompraGlobal, PrimeiraCompraPorVendedor),
+        [DataPrimeiraCompra] = [DataPrimeiraCompraVendedor] &&
+        [DataPrimeiraCompraVendedor] IN VALUES(Calendario[Data])
+    )
+
+RETURN 
+COUNTROWS(ClientesFiltrados)
