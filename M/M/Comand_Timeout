@@ -1,0 +1,4 @@
+CommandTimeout=#duration(10, 0, 0, 0)
+
+
+Configurado para 10 horas (#duration(dias, horas, minutos, segundos)).
