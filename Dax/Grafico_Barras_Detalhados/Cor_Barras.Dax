@@ -1,0 +1,8 @@
+Cor_Barras = 
+IF(
+    [Total De Vendas 0]<=[Total De Vendas Ano Ant.],
+    [Cor_Ruim],
+    [Cor_Boa]
+)
+
+// Condicional para aplicar nas barras do Grafico

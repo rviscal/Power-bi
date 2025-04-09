@@ -1,0 +1,37 @@
+Tutorial: Gráfico de Barras com Indicadores de Comparação no Power BI
+
+1 - Criar Medidas Básicas:
+- Total Atual
+- Total Mês Anterior ou Total Ano Anterior
+- % Mês Anterior ou % Ano Anterior
+
+2 - Selecionar Gráfico de Barras com Linhas:
+- No Eixo X, colocar o Mês ou Período desejado
+- No Eixo Y, adicionar a medida Total Atual
+
+3 - Inserir a Medida Linha_Barras no Eixo Y (Linhas):
+- Essa medida controla a altura dos pontos (onde as bolinhas vão aparecer)
+
+4 - Formatar a Linha:
+- Na aba Formatação de Linha, definir Transparência: 100%
+
+5 - Criar o Efeito dos Traços Pretos:
+- Ir até Erro de Coluna (Error Bar)
+- Inserir a medida Total Ano Anterior ou Período Selecionado nos dois campos de erro (mínimo e máximo)
+- Em Marcadores, aumentar o tamanho para 10px
+
+6 - Inserir Valores nas Bolinhas:
+- Ir em Rótulos de Dados (Data Labels) e ativar
+- Em Valor Total, desabilitar a opção "Mostrar para esta série", deixando ativa apenas para Linha_Barras
+- Em Valores, adicionar % Mês Anterior ou % Ano Anterior
+- Definir a posição como Acima
+- Em Marcadores, habilitar e escolher a cor e o tamanho desejado
+
+7 - Adicionar Cores Condicionais nas Barras:
+- Criar 3 medidas de cor:
+  - Cor_Boa
+  - Cor_Ruim
+  - Cor_Barras
+- Em Formatar > Colunas, aplicar formatação condicional com a medida Cor_Barras
+- Dessa forma, quando o valor for menor que o período anterior, a cor será aplicada de acordo com sua lógica condicional
+

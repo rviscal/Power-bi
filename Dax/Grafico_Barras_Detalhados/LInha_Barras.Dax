@@ -1,0 +1,9 @@
+Linha_Barras = 
+
+MAXX(
+    ADDCOLUMNS(
+    SUMMARIZE(ALL(Calendario),
+    Calendario[Mes],
+    Calendario[Nome_Mes]),
+    "Vendas",[Total De Vendas 0]),
+    [Total De Vendas 0] * 1.5
