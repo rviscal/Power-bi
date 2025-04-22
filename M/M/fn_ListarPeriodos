@@ -1,0 +1,23 @@
+() => 
+let
+    AnoInicial = 2023,
+    AnoAtual = Date.Year(DateTime.LocalNow()),
+    MesAtual = Date.Month(DateTime.LocalNow()),
+    ListaAnos = {AnoInicial..AnoAtual},
+    ListaMeses = List.Combine(List.Transform(ListaAnos, (ano) => List.Transform({1..12}, (mes) => [Ano = ano, Mes = mes]))),
+    FiltrarMesesAteAtual = List.Select(ListaMeses, each [Ano] < AnoAtual or ([Ano] = AnoAtual and [Mes] <= MesAtual)),
+    TabelaMeses = Table.FromRecords(FiltrarMesesAteAtual),
+    FormatarMeses = Table.TransformColumns(TabelaMeses, {"Mes", each Text.PadStart(Text.From(_), 2, "0")}),
+    AdicionarColunasDatas = Table.AddColumn(
+        Table.AddColumn(
+            FormatarMeses, 
+            "Data Inicial", 
+            each Text.From(Date.FromText(Text.From([Ano]) & "-" & [Mes] & "-01"))
+        ), 
+        "Data Final", 
+        each Text.From(Date.EndOfMonth(Date.FromText(Text.From([Ano]) & "-" & [Mes] & "-01")))
+    ),
+    AdicionarColunaPeriodo = Table.AddColumn(AdicionarColunasDatas, "Periodo", each [Mes] & "/" & Text.From([Ano])),
+    TabelaFinal = Table.SelectColumns(AdicionarColunaPeriodo, {"Periodo", "Data Inicial", "Data Final"})
+in
+    TabelaFinal
