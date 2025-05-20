@@ -1,6 +1,6 @@
 createOrReplace
 
-	table dim_calendario
+	table dCalendario
 		dataCategory: Time
 
 		column Data
@@ -1053,7 +1053,7 @@ createOrReplace
 
 			annotation SummarizationSetBy = Automatic
 
-		partition dim_calendario = m
+		partition dCalendario = m
 			mode: import
 			source = ```
 					let
