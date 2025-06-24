@@ -1,734 +1,384 @@
-//********Configurações********
+let
+					
+    #"-----PARAMETERS-----" = "",
 
-    let 
-    //Especifique a data inicial 
-    dataInicial = #date(2024, 1, 1), 
+    // Specify the start date 
+    startDate = #date(2020, 1, 1),
 
-    //Especifique a data final. Padrão: Final do ano atual 
-    dataFinal = Date.EndOfYear ( Date.From ( DateTime.LocalNow ( ) ) ), 
+    // Years ahead today
+    yearsAhead = 1,
+            
+    // Specify the start of the week. Default: Day.Monday 
+    startOfWeek = Day.Monday,
     
-    //Especifique a data atual. Padrão: Data atual do servidor 
-    dataAtual = Date.From ( DateTime.LocalNow ( ) ), 
-
-    //Especifique o início da semana. Padrão: Day.Monday (Segunda-feira) 
-    inicioSemana = Day.Monday, 
-
-    //Especifique o mês do início do ano fiscal. Padrão: 4 (Abril)
-    mesInicioAnoFiscal = 4, 
-
-    /*Dia de início do mês de fechamento. 
-        Padrão: 16 (siginifica que o mês de fechamento vai de 16 do mês corrente 
-        até o dia 15 do próximo mês */
-    diaInicioMesFechamento = 16, 
-
-    //Especifique o idioma. Padrão: pt-BR (Português do Brasil)
-    idioma = "pt-BR", 
-
-    //Geração da tabela
-    dCalendario = let
-
-    //Lista com todas as datas 
-    datasRange = List.Buffer ( 
-        List.Transform ( 
-            { Number.From ( dataInicial ) .. Number.From ( dataFinal ) }, 
-            Date.From 
-        ) 
-    ), 
-
-    //Lista com todos os anos 
-    anosRange = List.Buffer ( 
-        { Date.Year ( dataInicial ) .. Date.Year ( dataFinal )} 
-    ), 
-
-    //Feriados fixos que ocorrem em todos os anos 
-    feriadosFixosCadastro = #table ( 
-        type table [ 
-            Dia = Int64.Type, 
-            Mes = Int64.Type, 
-            Feriado = text 
-        ],
-        {
-          // Dia, Mês, Feriado
-            { 01, 01, "Confraternização Universal"   }, 
-            { 25, 01, "Aniversário da Cidade"        }, 
-            { 21, 04, "Tiradentes"                   }, 
-            { 01, 05, "Dia do Trabalhador"           }, 
-            { 09, 07, "Revolução Constitucionalista" }, 
-            { 07, 09, "Independência do Brasil"      }, 
-            { 12, 10, "N. Srª Aparecida"             }, 
-            { 02, 11, "Finados"                      }, 
-            { 15, 11, "Proclamação da República"     }, 
-            { 20, 11, "Consciência Negra"            }, 
-            { 24, 12, "Véspera de Natal"             }, 
-            { 25, 12, "Natal"                        }, 
-            { 31, 12, "Véspera de Ano Novo"          } 
-        } 
-    ), 
-
-    //Função que gera os feriados fixos para todos os anos 
-    fxGeraFeriadosFixos = ( ano ) => 
-        Table.AddColumn ( 
-            feriadosFixosCadastro, 
-            "Data", 
-            each #date ( ano, [Mes], [Dia] ), 
-            type date 
-        ) 
-        [ [Data], [Feriado] ], 
-
-    //Gera a tabela de feriados fixos 
-    feriadosFixos = Table.Combine ( 
-        List.Transform ( 
-            anosRange, 
-            fxGeraFeriadosFixos 
-        ) 
-    ), 
-
-    //Função que gera os feriados móveis 
-    fxGeraFeriadosMoveis = ( ano ) => 
-        let 
-            modExcel =  ( x, y ) => let m = Number.Mod ( x, y ) in if  m < 0 then m + y else m, 
-            pascoa =  Date.From ( 
-                Number.Round ( 
-                    Number.From ( #date ( ano, 4, 1 ) ) / 7 
-                    +  modExcel ( 19 * modExcel ( ano, 19 ) - 7, 30 ) * 0.14, 
-                    0, 
-                    RoundingMode.Up 
-                ) 
-                * 7 - 6 
-            ), 
-            feriadosMoveis =  #table ( 
-                type table [ 
-                    Data = date, 
-                    Feriado = text 
-                ], 
-                { 
-                    { Date.AddDays(pascoa, -48 ), "Segunda-feira de Carnaval"  }, 
-                    { Date.AddDays(pascoa, -47 ), "Terça-feira de Carnaval"    }, 
-                    { Date.AddDays(pascoa, -46 ), "Quarta-feira de Cinzas"     }, 
-                    { Date.AddDays(pascoa, -2  ), "Sexta-Feira Santa"          }, 
-                    { pascoa                    , "Páscoa"                     }, 
-                    { Date.AddDays(pascoa, 60  ), "Corpus Christi"             } 
-                } 
-            ) 
-        in 
-            feriadosMoveis, 
-
-    //Gera a tabela de feriados móveis 
-    feriadosMoveis = Table.Combine ( 
-        List.Transform ( 
-            anosRange, 
-            fxGeraFeriadosMoveis 
-        ) 
-    ),  
-
-    //Tabela contendo todos os feriados 
-    feriados = Table.Combine ( 
-        { feriadosFixos, feriadosMoveis } 
-    ), 
-
-    //Define a função de transformação de cada data 
-    fxLinhaCalendario = ( data ) => 
-        let 
-        //Transformações de simples passada para reutilização
-            zws = Character.FromNumber ( 8203 ), //Caracter invisível (zero-width spacing )
-            dataOffset = Number.From ( data - dataAtual ), 
-            ano = Date.Year ( data ), 
-            mes = Date.Month ( data ), 
-            trimestre = Date.QuarterOfYear ( data ), 
-            anoInicial = Date.Year ( dataInicial ), 
-            anoAtual = Date.Year ( dataAtual ), 
-            anoFinal = Date.Year ( dataFinal ), 
-            anoOffset = ano - anoAtual, 
-            mesInicial = Date.Month ( dataInicial ), 
-            mesAtual = Date.Month ( dataAtual ), 
-            trimestreInicial = Date.QuarterOfYear ( dataInicial ), 
-            trimestreAtual = Date.QuarterOfYear ( dataAtual ), 
-            diaSemana = Date.DayOfWeek ( data, inicioSemana ) + 1, 
-            diaSemanaIndiceZws = Text.Repeat ( zws, 7 - diaSemana ), 
-            semanaDoAnoIsoNo = 
-                let 
-                    quintaNaSemana = Date.AddDays ( data, 3 - Date.DayOfWeek ( data, Day.Monday ) ), 
-                    inicioAnoQuintaNaSemana = #date ( Date.Year ( quintaNaSemana ), 1, 1 ), 
-                    difDias = Duration.Days ( quintaNaSemana - inicioAnoQuintaNaSemana ) 
-                in 
-                    Number.IntegerDivide ( difDias, 7, 0 ) + 1, 
-            semanaDoAnoNum = Date.WeekOfYear ( data, inicioSemana ), 
-            diaSemanaNome = Text.Proper ( Date.DayOfWeekName ( data, idioma ) ), 
-            mesNome = Text.Proper ( Date.MonthName ( data, idioma ) ), 
-            mesIndiceZws = Text.Repeat ( zws, 12 - mes ), 
-            mesAnoIndice = 12 * ( ano - anoInicial ) + mes, 
-            inicioMes = Date.StartOfMonth ( data ),
-            fimMes = Date.EndOfMonth ( data ),
-            diaMes = Date.Day ( data ), 
-            mesOffset =  ( ( ano * 12 ) - 1 + mes ) - ( ( anoAtual * 12 ) - 1 + mesAtual ), 
-            trimestreOffset = ( ( ano * 4 ) - 1 + trimestre ) - ( ( anoAtual * 4 ) - 1 + trimestreAtual ), 
-            trimestreAno = "T" & Text.From ( trimestre ) & "/" & Text.From ( ano ), 
-            anoIso = Date.Year ( Date.AddDays ( data, 26 - semanaDoAnoIsoNo ) ), 
-            inicioSemanaIsoLinha = Date.StartOfWeek ( data, Day.Monday ), 
-            fimSemanaIsoLinha = Date.EndOfWeek ( data, Day.Monday ), 
-            inicioSemanaLinha = Date.StartOfWeek ( data, inicioSemana ), 
-            fimSemanaLinha = Date.EndOfWeek ( data, inicioSemana ), 
-            inicioSemanaIsoInicial = Date.StartOfWeek ( data, Day.Monday ), 
-            inicioSemanaInicial = Date.StartOfWeek ( dataInicial, inicioSemana ), 
-            inicioSemanaIsoAtual = Date.StartOfWeek ( dataAtual, Day.Monday ),
-            inicioSemanaAtual = Date.StartOfWeek ( dataAtual, inicioSemana ), 
-            semanaIsoOffset = Number.From ( inicioSemanaIsoLinha - inicioSemanaIsoAtual ) / 7,
-            semanaOffset = Number.From ( inicioSemanaLinha - inicioSemanaAtual ) / 7, 
-            semanaAnoIso = "S" & Text.PadStart ( Text.From ( semanaDoAnoIsoNo ), 2, "0" ) & "/" & Text.From ( anoIso ), 
-            semanaAno = "S" & Text.PadStart ( Text.From ( semanaDoAnoNum ), 2, "0" ) & "/" & Text.From ( ano ), 
-            semanaDoMes = 
-                let 
-                    inicioMes = Date.StartOfMonth ( Date.StartOfWeek ( data,inicioSemana ) ), 
-                    primeirosSeteDias = List.Dates ( inicioMes, 7, #duration ( 1, 0, 0, 0 ) ), 
-                    primeiroDia = List.Select ( primeirosSeteDias, each Date.DayOfWeek ( _, inicioSemana ) = 0 ) { 0 } 
-                in 
-                    Number.RoundUp ( Duration.Days ( data-primeiroDia ) / 7 + 0.05 ), 
-            anoSemanal = Date.Year ( inicioSemanaLinha ), 
-            mesSemanal = Date.Month ( inicioSemanaLinha ) , 
-            mesSemanalNome = Text.Proper ( Date.MonthName ( inicioSemanaLinha, idioma ) ), 
-            mesSemanalNomeAbrev = Text.Start ( mesSemanalNome, 3 ), 
-            semanaDoMesPadraoNum = Date.WeekOfMonth ( data, inicioSemana ), 
-            quinzenaDoMesNo = if Date.Day ( data ) <= 15 then 1 else 2, 
-            quinzenaDoMesNoAtual = if Date.Day ( dataAtual ) <= 15 then 1 else 2, 
-            mesAno = Text.Proper ( Date.ToText ( data, [ Format="MMM/yy", Culture =idioma ] ) ), 
-            quinzenaMesAno = "Qui " & Text.From ( quinzenaDoMesNo ) & " - " & mesAno, 
-            quinzenaIndice = 24 * ( ano - anoInicial ) + 2 * ( mes - mesInicial ) + quinzenaDoMesNo, 
-            quinzenaIndiceAtual = 24 *  ( anoAtual - anoInicial ) + 2 * ( mesAtual - mesInicial ) + quinzenaDoMesNoAtual, 
-            quinzenaOffset = quinzenaIndice - quinzenaIndiceAtual, 
-            semestreNo = if mes <= 6 then 1 else 2, 
-            semestreNoAtual = if mesAtual <= 6 then 1 else 2, 
-            semestreIndice = ( 2 * ( ano - anoInicial ) ) + semestreNo, 
-            semestreIndiceAtual = ( 2 * ( anoAtual - anoInicial ) ) + semestreNoAtual, 
-            semestreOffset = semestreIndice - semestreIndiceAtual, 
-            semestreAno = "S" & Text.From ( semestreNo ) & " - " & Text.From ( ano ), 
-            bimestreNo = Number.RoundUp ( mes / 2, 0 ), 
-            bimestreNoAtual = Number.RoundUp ( mesAtual / 2, 0 ), 
-            bimestreAno = "B" & Text.From ( bimestreNo ) & " - " & Text.From ( ano ), 
-            bimestreIndice = ( 6 * ( ano - anoInicial ) ) + bimestreNo, 
-            bimestreIndiceAtual = ( 6 * ( anoAtual - anoInicial ) ) + bimestreNoAtual, 
-            bimestreOffset = bimestreIndice - bimestreIndiceAtual, 
-            feriado = try feriados{[ Data = data ]}[Feriado] otherwise null, 
-            diaUtilNo = if feriado <> null 
-                or List.Contains ( 
-                    { 6 .. 7 }, 
-                    Date.DayOfWeek ( data, Day.Monday ) + 1 
-                ) 
-                then 0 
-                else 1, 
-            mesDiaNo = Date.Month ( data ) * 100 + Date.Day ( data ), 
-            estacaoAnoNo = 
-                if mesDiaNo >= 321 and mesDiaNo <= 620 then 1 else 
-                if mesDiaNo >= 621 and mesDiaNo <= 921 then 2 else 
-                if mesDiaNo >= 922 and mesDiaNo <= 1221 then 3 else 
-                4 ,
-            dataReferenciaFechamento = if diaMes <= diaInicioMesFechamento - 1 then data else Date.AddMonths ( data, 1 )  
-
-        in 
-        //Saída das transformações 
-        { 
-            //DataIndice 
-            Number.From ( data - dataInicial ) + 1, 
-
-            //Data 
-            data, 
-
-            //DataOffset 
-            dataOffset, 
-
-            //DataNomeAtual 
-            if dataOffset = 0 then "Data Atual" 
-                else if dataOffset = -1 then "Data Anterior" 
-                else if dataOffset = 1 then "Próxima Data" 
-                else Date.ToText ( data, "dd/MM/yyyy" ), 
-
-            //AnoNum 
-            ano, 
-
-            //AnoInicio 
-            Date.StartOfYear ( data ), 
-
-            //AnoFim 
-            Date.EndOfYear ( data ), 
-
-            //AnoIndice 
-            ano - anoInicial + 1, 
-
-            //AnoDecrescenteNome 
-            ano, 
-
-            //AnoDescrescenteNum 
-            ano * -1, 
-
-            //AnoFiscal 
-            if mes >= mesInicioAnoFiscal then ano else ano - 1, 
-
-            //AnoOffset 
-            anoOffset, 
-
-            //AnoNomeAtual 
-            if anoOffset = 0 then "Ano Atual" 
-                else if anoOffset = -1 then "Ano Anterior" 
-                else if anoOffset = 1 then "Próximo Ano" 
-                else Date.ToText ( data, "yyyy" ),
-
-            //DiaDoMesNum 
-            diaMes, 
-
-            //DiaDoAnoNum 
-            Date.DayOfYear ( data ), 
-
-            //DiaDaSemanaNum 
-            diaSemana, 
-
-            //DiaDaSemanaNome 
-            diaSemanaNome, 
-
-            //DiaDaSemanaNomeAbrev 
-            Text.Start ( diaSemanaNome, 3 ), 
-
-            //DiaDaSemanaNomeIniciais 
-            diaSemanaIndiceZws & Text.Start ( diaSemanaNome, 1 ), 
-
-            //MesNum 
-            mes, 
-
-            //MesNome 
-            mesNome, 
-
-            //MesNomeAbrev 
-            Text.Start ( mesNome, 3 ), 
-
-            //MesNomeIniciais 
-            mesIndiceZws & Text.Start ( mesNome, 1 ), 
-
-            //MesAnoNum 
-            ano * 100 + mes, 
-
-            //MesAnoMome 
-            mesAno, 
-
-            //MesDiaNum 
-            mes * 100 + diaMes, 
-
-            //MesDiaNome
-            Text.Proper ( Date.ToText ( data, [Format="MMM/dd", Culture =idioma] )), 
-
-            //MesInicio 
-            Date.StartOfMonth ( data ), 
-
-            //MesFim 
-            Date.EndOfMonth ( data ), 
-            
-            //MesIndice 
-            mesAnoIndice, 
-            
-            //MesOffset 
-            mesOffset, 
-            
-            //MesNomeAtual 
-            if mesOffset = 0 then "Mês Atual" 
-                else if mesOffset = -1 then "Mês Anterior" 
-                else if mesOffset = 1 then "Próximo Mês" 
-                else mesNome, 
-
-            //MesNomeAbrevAtual 
-            if mesOffset = 0 then "Mês Atual" 
-                else if mesOffset = -1 then "Mês Anterior" 
-                else if mesOffset = 1 then "Próximo Mês" 
-                else Text.Start ( mesNome, 3 ), 
-            
-            //MesAnoNomeAtual 
-            if mesOffset = 0 then "Mês Atual" 
-                else if mesOffset = -1 then "Mês Anterior" 
-                else if mesOffset = 1 then "Próximo Mês" 
-                else mesAno, 
-            
-            //TrimestreNum 
-            trimestre, 
-
-            //TrimestreInicio 
-            Date.StartOfQuarter ( data ), 
-
-            //TrimestreFinal 
-            Date.EndOfQuarter ( data ), 
-
-            //TrimestreAnoNum
-            ano * 100 + trimestre, 
-
-            //TrimestreAnoNome 
-            trimestreAno, 
-
-            //TrimestreIndice 
-            4 * ( ano - anoInicial ) + trimestre, 
-
-            //TrimestreOffset 
-            trimestreOffset, 
-
-            //TrimestreAnoNomeAtual 
-            if trimestreOffset = 0 then "Trimestre Atual" 
-                else if trimestreOffset = -1 then "Trimestre Anterior" 
-                else if trimestreOffset = 1 then "Próximo Trimestre" 
-                else trimestreAno, 
-
-            //SemanaIsoNum 
-            semanaDoAnoIsoNo, 
-
-            //AnoIsoNum 
-            anoIso, 
-
-            //SemanaIsoAnoNum 
-            anoIso * 100 + semanaDoAnoIsoNo, 
-
-            //SemanaIsoAnoNome 
-            semanaAnoIso, 
-
-            //SemanaIsoInicio 
-            inicioSemanaIsoLinha, 
-
-            //SemanaIsoFim 
-            fimSemanaIsoLinha, 
-
-            //SemanaIsoIndice 
-            Number.From ( inicioSemanaIsoLinha - inicioSemanaIsoInicial ) / 7 + 1, 
-
-            //SemanaIsoOffset 
-            semanaOffset, 
-
-            //SemanaIsoAnoNomeAtual 
-            if semanaIsoOffset = 0 then "Semana Atual" 
-                else if semanaIsoOffset = -1 then "Semana Anterior" 
-                else if semanaIsoOffset = 1 then "Próxima Semana" 
-                else semanaAnoIso, 
-
-            //SemanaNo 
-            semanaDoAnoNum, 
-
-            //SemanaAnoNum 
-            ano * 100 + semanaDoAnoNum, 
-
-            //SemanaAnoNome 
-            semanaAno, 
-
-            //SemanaInicio 
-            inicioSemanaLinha, 
-
-            //SemanaFim 
-            fimSemanaLinha, 
-
-            //SemanaPeriodo
-            Date.ToText ( inicioSemanaLinha, "dd/MM/yyyy" ) & " a " & Date.ToText ( fimSemanaLinha, "dd/MM/yyyy" ),
-
-            //SemanaIndice 
-            Number.From ( inicioSemanaLinha - inicioSemanaInicial ) / 7 + 1, 
-
-            //SemanaOffset
-            semanaOffset, 
-
-            //SemanaAnoNomeAtual 
-            if semanaOffset = 0 then "Semana Atual" 
-                else if semanaOffset = -1 then "Semana Anterior" 
-                else if semanaOffset = 1 then "Próxima Semana" 
-                else semanaAno, 
-
-            //SemanaDoMesNum 
-            semanaDoMes, 
-
-            //AnoSemanalNum 
-            anoSemanal, 
-
-            //MesSemanalNum 
-            mesSemanal, 
-
-            //MesSemanalNome 
-            mesSemanalNome, 
-
-            //MesSemanalNomeAbrev 
-            mesSemanalNomeAbrev, 
-
-            //MesAnoSemanalNum 
-            anoSemanal * 100 + mesSemanal, 
-
-            //MesAnoSemanalNome 
-            Text.Proper ( Date.ToText ( inicioSemanaLinha, [ Format="MMM/yy", Culture=idioma ] )), 
-
-            //SemanaDoMesPadraoNum
-            semanaDoMesPadraoNum,
-
-            //SemanaDoMesAnoPadraoNome
-            mesAno & " " & Text.From ( semanaDoMesPadraoNum ),
-
-            //SemanaDoMesAnoPadraoNum
-            ano * 10000 + mes * 100 + semanaDoMesPadraoNum,
-
-            //QuinzenaDoMesNum 
-            quinzenaDoMesNo, 
-
-            //QuinzenaMesNum 
-            mes * 10 + quinzenaDoMesNo, 
-
-            //QuinzenaMesNome 
-            "Qui " & Text.From ( quinzenaDoMesNo ) & " - " & mesNome, 
-            
-            //QuinzenaMesAnoNum 
-            ano * 10000 + mes * 100 + quinzenaDoMesNo, 
-
-            //QuinzenaMesAnoNome 
-            quinzenaMesAno, 
-
-            //QuinzenaPeriodo
-            let 
-                inicioQuinzena = if quinzenaDoMesNo = 1 then inicioMes else Date.AddDays ( inicioMes, 15  ),
-                fimQuinzena = if quinzenaDoMesNo = 2 then fimMes else Date.AddDays ( inicioMes, 14 )
-            in
-                Date.ToText ( inicioQuinzena, "dd/MM/yyyy" ) & " a " & Date.ToText ( fimQuinzena, "dd/MM/yyyy" ),
-
-            //QuinzenaIndice
-            quinzenaIndice,
-
-            //QuinzenaOffset 
-            quinzenaOffset, 
-
-            //QuinzenaMesAnoNomeAtual 
-            if quinzenaOffset = 0 then "Quinzena Atual" 
-                else if quinzenaOffset = -1 then "Quinzena Anterior" 
-                else if quinzenaOffset = 1 then "Próxima Quinzena" 
-                else quinzenaMesAno, 
-
-            //SemestreDoAnoNum 
-            semestreNo, 
-
-            //SemestreAnoNum 
-            ano * 100 + semestreNo, 
-
-            //SemestreAnoNome
-            "S" & Text.From ( semestreNo ) & " - " & Text.From ( ano ), 
-
-            //SemestreIndice 
-            semestreIndice, 
-
-            //Semestre Offset 
-            semestreOffset, 
-
-            //SemestreAnoNomeAtual 
-            if semestreOffset = 0 then "Semestre Atual" 
-                else if semestreOffset = -1 then "Semestre Anterior" 
-                else if semestreOffset = 1 then "Próximo Semestre" 
-                else semestreAno, 
-            
-            //BimestreDoAnoNum 
-            bimestreNo, 
-
-            //BimestreAnoNum 
-            ano * 100 + bimestreNo, 
-
-            //BimestreAnoNome 
-            bimestreAno, 
-
-            //BimestreIndice 
-            bimestreIndice, 
-
-            //BimestrOffset 
-            bimestreOffset, 
-
-            //BimestreAnoNomeAtual 
-            if bimestreOffset = 0 then "Bimestre Atual" 
-                else if bimestreOffset = -1 then "Bimestre Anterior" 
-                else if bimestreOffset = 1 then "Próximo Bimestre" 
-                else bimestreAno, 
-
-            //FeriadoNome 
-            feriado, 
-
-            //DiaUtilNum 
-            diaUtilNo, 
-
-            //DiaUtilNome 
-            if diaUtilNo = 0 then "Dia Não Útil" else "Dia Útil", 
-            
-            //EstacaoAnoNum 
-            estacaoAnoNo, 
-
-            //EstacaoAnoNome 
-            if estacaoAnoNo = 1 then "Outono" 
-                else if estacaoAnoNo = 2 then "Inverno" 
-                else if estacaoAnoNo = 3 then "Primavera" 
-                else "Verão",
-
-            //MesFechamentoNum
-            Date.Month ( dataReferenciaFechamento ),
-
-            //MesFechamentoNome
-            Text.Proper ( Date.ToText ( dataReferenciaFechamento, [ Format = "MMMM", Culture = idioma ] ) ),
-
-            //MesFechamentoNomeAbrev
-            Text.Proper ( Date.ToText ( dataReferenciaFechamento, [ Format = "MMM", Culture = idioma ] ) ),
-
-            //AnoFechamentoNum
-            Date.Year ( dataReferenciaFechamento ),
-
-            //MesAnoFechamentoNum
-            Date.Year ( dataReferenciaFechamento ) * 100 + Date.Month ( dataReferenciaFechamento ),
-
-            //MesAnoFechamentoNome
-            Text.Proper ( Date.ToText ( dataReferenciaFechamento, [ Format = "MMM/yy", Culture = idioma ] ) ),
-
-            //DataFutura
-            dataOffset > 0
-
-        }, 
-
-    //Gera a tabela calendário 
-    calendario = #table ( 
-
-        //Nomes e tipos das colunas 
-        type table [ 
-            DataIndice = Int64.Type, 
-            Data = date, 
-            DataOffset = Int64.Type, 
-            DataNomeAtual = text, 
-            AnoNum = Int64.Type, 
-            AnoInicio = date, 
-            AnoFim = date, 
-            AnoIndice = Int64.Type, 
-            AnoDecrescenteNome = Int64.Type, 
-            AnoDecrescenteNum = Int64.Type, 
-            AnoFiscal = Int64.Type, 
-            AnoOffset = Int64.Type, 
-            AnoNomeAtual = text, 
-            DiaDoMesNum = Int64.Type, 
-            DiaDoAnoNum = Int64.Type, 
-            DiaDaSemanaNum = Int64.Type, 
-            DiaDaSemanaNome = text, 
-            DiaDaSemanaNomeAbrev = text, 
-            DiaDaSemanaNomeIniciais = text,
-            MesNum = Int64.Type, 
-            MesNome = text, 
-            MesNomeAbrev = text, 
-            MesNomeIniciais = text, 
-            MesAnoNum = Int64.Type, 
-            MesAnoNome = text, 
-            MesDiaNum = Int64.Type, 
-            MesDiaNome = text, 
-            MesInicio = date, 
-            MesFim = date, 
-            MesIndice = Int64.Type, 
-            MesOffset = Int64.Type, 
-            MesNomeAtual = text, 
-            MesNomeAbrevAtual = text, 
-            MesAnoNomeAtual = text, 
-            TrimestreNum = Int64.Type, 
-            TrimestreInicio = date, 
-            TrimestreFim = date, 
-            TrimestreAnoNum = Int64.Type,
-            TrimestreAnoNome = text, 
-            TrimestreIndice = Int64.Type, 
-            TrimestreOffset = Int64.Type, 
-            TrimestreAnoNomeAtual = text, 
-            SemanaIsoNum = Int64.Type,
-            AnoIsoNum = Int64.Type, 
-            SemanaIsoAnoNum = Int64.Type, 
-            SemanaIsoAnoNome = text, 
-            SemanaIsoInicio = date, 
-            SemanaIsoFim = date, 
-            SemanaIsoIndice = Int64.Type, 
-            SemanaIsoOffset = Int64.Type, 
-            SemanaIsoAnoNomeAtual = text, 
-            SemanaNum = Int64.Type, 
-            SemanaAnoNum = Int64.Type, 
-            SemanaAnoNome = text, 
-            SemanaInicio = date, 
-            SemanaFim = date, 
-            SemanaPeriodo = text,
-            SemanaIndice = Int64.Type, 
-            SemanaOffset = Int64.Type, 
-            SemanaAnoNomeAtual = text, 
-            SemanaDoMesNum = Int64.Type, 
-            AnoSemanalNum = Int64.Type, 
-            MesSemanalNum = Int64.Type, 
-            MesSemanalNome = text, 
-            MesSemanalNomeAbrev = text, 
-            MesAnoSemanalNum = Int64.Type, 
-            MesAnoSemanalNome = text, 
-            SemanaDoMesPadraoNum = Int64.Type,
-            SemanaDoMesAnoPadraoNome = text, 
-            SemanaDoMesAnoPadraoNum = Int64.Type, 
-            QuinzenaDoMesNum = Int64.Type,
-            QuinzenaMesNum = Int64.Type, 
-            QuinzenaMesNome = text, 
-            QuinzenaMesAnoNum = Int64.Type, 
-            QuinzenaMesAnoNome = text, 
-            QuinzenaPeriodo = text,
-            QuinzenaIndice = Int64.Type, 
-            QuinzenaOffset = Int64.Type, 
-            QuinzenaMesAnoNomeAtual = text, 
-            SemestreDoAnoNum = Int64.Type, 
-            SemestreAnoNum = Int64.Type, 
-            SemestreAnoNome = text, 
-            SemestreIndice = Int64.Type, 
-            SemestreOffset = Int64.Type, 
-            SemestreAnoNomeAtual = text,
-            BimestreDoAnoNum = Int64.Type, 
-            BimestreAnoNum = Int64.Type, 
-            BimestreAnoNome = text, 
-            BimestreIndice = Int64.Type, 
-            BimestreOffset = Int64.Type, 
-            BimestreAnoNomeAtual = text, 
-            FeriadoNome = text, 
-            DiaUtilNum = Int64.Type, 
-            DiaUtilNome = text, 
-            EstacaoAnoNum = Int64.Type, 
-            EstacaoAnoNome = text, 
-            MesFechamentoNum = Int64.Type,
-            MesFechamentoNome = text, 
-            MesFechamentoNomeAbrev = text, 
-            AnoFechamentoNum = Int64.Type,
-            MesAnoFechamentoNum = Int64.Type,
-            MesAnoFechamentoNome = text,
-            DataFutura = Logical.Type 
-        ], 
-
-        //Invoca função de transformação 
-        List.Transform ( datasRange, fxLinhaCalendario ) 
+    // Specify the month of the fiscal year end. Default: 3 (March)
+    monthOfFiscalYearEnd = 3,
+    
+    /* Start day of the closing month. 
+        Default: 16 (it means the closing month goes from the 16th of the current month 
+        to the 15th of the next month) */
+    closingMonthStartDay = 16,
+    
+    // Available: "en-US", "pt-BR", "es-ES"
+    language = "pt-BR",
+
+    #"-----INTERNAL USE-----" = "",
+    
+    endDate = Date.AddYears(Date.EndOfYear(Date.From(DateTime.LocalNow())), yearsAhead),
+    currentDate = Date.From(DateTime.LocalNow()),
+    currentYear = Date.Year(currentDate),
+    currentMonth = Date.Month(currentDate),  
+    startYear = Date.Year(startDate),
+    startMonth = Date.Month(startDate),
+    currentFiscalYear = Date.Year(Date.AddMonths(currentDate, 12-monthOfFiscalYearEnd)), 
+    
+
+    // The table with auxiliary texts cross the languages
+    auxiliaryTextTable = Table.UnpivotOtherColumns(
+        #table(
+            type table [Class=text, #"en-US"=text, #"pt-BR"=text, #"es-ES"=text],
+            {
+                    { "current"        , "Current"        , "Atual"       , "Actual"              }
+                , { "quarter"        , "Q"              , "T"           , "T"                   }
+                , { "week"           , "W"              , "S"           , "S"                   }
+                , { "half"           , "H"              , "S"           , "S"                   }
+                , { "bimester"       , "B"              , "B"           , "B"                   }
+                , { "fortnight"      , "FN"             , "Q"           , "Q"                   }
+                , { "summer"         , "Summer"         , "Verão"       , "Verano"              }
+                , { "spring"         , "Spring"         , "Primavera"   , "Primavera"           }
+                , { "autumn"         , "Autumn"         , "Outono"      , "Otoño"               }
+                , { "winter"         , "Winter"         , "Inverno"     , "Invierno"            }
+                , { "businessDay"    , "BusinessDay"    , "Dia Útil"    , "Dia Laborable"       }
+                , { "non-businessDay", "Non-BusinessDay", "Dia Não Útil", "Dia No Laborable"    }
+            }
+        ),
+        {"Class"}, "Language", "Value"
     ),
     
-    // Adiciona o número do dia útil do mês
-    adDiaUtilMes = 
-    let
-        tabela = Table.Buffer ( 
-            Table.SelectColumns ( 
-                calendario, 
-                { "DiaDoMesNum", "MesIndice", "DiaUtilNum" } 
-            ) 
-        ), 
+    // Filtered table on selected language
+    auxiliaryTextTableOnLanguage = Table.Buffer(Table.SelectRows(auxiliaryTextTable, each [Language]=language)),
+    currentText = auxiliaryTextTableOnLanguage{[Class="current"]}[Value], 
+    quarterPrefix = auxiliaryTextTableOnLanguage{[Class="quarter"]}[Value], 
+    weekPrefix = auxiliaryTextTableOnLanguage{[Class="week"]}[Value],
+    halfPrefix = auxiliaryTextTableOnLanguage{[Class="half"]}[Value],
+    bimesterPrefix = auxiliaryTextTableOnLanguage{[Class="bimester"]}[Value],
+    fortnightPrefix = auxiliaryTextTableOnLanguage{[Class="fortnight"]}[Value],
+    summerText = auxiliaryTextTableOnLanguage{[Class="summer"]}[Value],
+    springText = auxiliaryTextTableOnLanguage{[Class="spring"]}[Value],
+    autumnText = auxiliaryTextTableOnLanguage{[Class="autumn"]}[Value],
+    winterText = auxiliaryTextTableOnLanguage{[Class="winter"]}[Value],
+    businessDayText = auxiliaryTextTableOnLanguage{[Class="businessDay"]}[Value],
+    nonBusinessDayText = auxiliaryTextTableOnLanguage{[Class="non-businessDay"]}[Value],
+    
+    // Invisible character (zero-width spacing)
+    zws = Character.FromNumber(8203),  
 
-        addDiaUtilMes = Table.AddColumn (
-            tabela, 
-            "DiaUtilDoMes", 
-            each let 
-                __mesIndice = [MesIndice], 
-                __DiaDoMes = [DiaDoMesNum] 
-            in 
-                List.Sum ( 
-                    Table.SelectRows ( 
-                        tabela, 
-                        each [MesIndice] = __mesIndice  
-                            and [DiaDoMesNum] <= __DiaDoMes 
-                    )
-                    [DiaUtilNum]
-                ), 
-            Int64.Type
-        )[ [MesIndice], [DiaDoMesNum], [DiaUtilDoMes] ], 
+    // List with all dates 
+    datesList = List.Dates(startDate, Duration.Days(endDate-startDate)+1, #duration(1, 0, 0, 0)),
 
-        join = Table.Join (
-            calendario, { "MesIndice", "DiaDoMesNum" },
-            addDiaUtilMes, { "MesIndice", "DiaDoMesNum" }
-        ) 
-    in
-        join 
+    // List with all years 
+    yearRange = List.Buffer({Date.Year(startDate)..Date.Year(endDate)}),
             
+
+    #"-----GENERATE HOLIDAYS-----" = "", 
+
+    // Fixed holidays that occur every year 
+    fixedHolidaysList = #table(
+        type table [Day=Int64.Type, Month=Int64.Type, Holiday=text],
+        
+        if language="pt-BR" then
+            {
+                // Day, Month, Holiday
+                    { 01, 01, "Confraternização Universal"   }
+                , { 25, 01, "Aniversário da Cidade"        } 
+                , { 21, 04, "Tiradentes"                   } 
+                , { 01, 05, "Dia do Trabalhador"           } 
+                , { 09, 07, "Revolução Constitucionalista" } 
+                , { 07, 09, "Independência do Brasil"      } 
+                , { 12, 10, "N. Srª Aparecida"             } 
+                , { 02, 11, "Finados"                      } 
+                , { 15, 11, "Proclamação da República"     } 
+                , { 20, 11, "Consciência Negra"            } 
+                , { 24, 12, "Véspera de Natal"             } 
+                , { 25, 12, "Natal"                        } 
+                , { 31, 12, "Véspera de Ano Novo"          } 
+            }
+
+        else if language="en-US" then
+            {
+                // Day, Month, Holiday
+                    { 1,  1, "New Year's Day"}
+                , { 4,  7, "Independence Day"}
+                , {11, 11, "Veterans Day"}
+                , {25, 12, "Christmas Day"}
+            }
+
+        else if language="es-ES" then
+            {
+                // Day, Month, Holiday
+                    { 1, 1, "Año Nuevo"}
+                , { 1, 5, "Día del Trabajo" } 
+            }
+        else null
+    ),
+
+    // Function that generates the fixed holidays for all years 
+    fxGenerateFixedHolidays = (year)=>
+        Table.AddColumn(
+            fixedHolidaysList,
+            "Date",
+            each #date(year, [Month], [Day]),
+            type date
+        )[[Date], [Holiday]],
+            
+    // Generate the fixed holiday table 
+    fixedHolidays = Table.Combine(List.Transform(yearRange, fxGenerateFixedHolidays)),
+    
+    // Function that generates the moving holidays 
+    fxGenerateMovingHolidays = (year) =>
+    let
+        modExcel = (x, y) =>
+            let
+                m = Number.Mod(x, y)
+            in
+                if m < 0 then m + y else m,
+        easter = Date.From(
+            Number.Round(
+                Number.From(#date(year, 4, 1))
+                    / 7
+                    + modExcel(19 * modExcel(year, 19) - 7, 30) * 0.14,
+                0,
+                RoundingMode.Up
+            )
+                * 7
+                - 6
+        ),
+        movingHolidays = #table(
+            type table [Date = date, Holiday = text],
+            {
+                    { Date.AddDays(easter, -2  ), if language = "pt-BR" then "Sexta-Feira Santa" else if language = "en-US" then "Good Friday" else if language = "es-ES" then "Viernes Santo" else null } 
+                , { easter                    , if language = "pt-BR" then "Páscoa" else if language = "en-US" then "Easter" else if language = "es-ES" then "Pascua" else null }
+                , { Date.AddDays(easter, 60  ), "Corpus Christi"             }
+            //  , { Date.AddDays(easter, -48 ), "Segunda-feira de Carnaval"  }
+            //  , { Date.AddDays(easter, -47 ), "Terça-feira de Carnaval"    }
+            //  , { Date.AddDays(easter, -46 ), "Quarta-feira de Cinzas"     }
+            }
+        )
+    in
+        movingHolidays,
+            
+    // Generate the moving holiday table 
+    movingHolidays = Table.Combine(List.Transform(yearRange, fxGenerateMovingHolidays)),
+            
+    // Table containing all holidays 
+    holidays = Table.Group(Table.Combine({fixedHolidays, movingHolidays}), {"Date"}, {{"Holiday", each Text.Combine(_[Holiday], "/"), type text}}),
+    
+    #"-----GENERATE DATA-----" = "",
+
+    #"-----DATE-----" = "",
+    datesTable = Table.FromList(datesList, Splitter.SplitByNothing(), type table [ Date = date ]),
+    add_DateIndex = Table.AddIndexColumn(datesTable, "DateIndex", 1, 1, Int64.Type),
+    add_DaysToToday = Table.AddColumn(add_DateIndex, "DaysToToday", each Number.From([Date] - currentDate), Int64.Type),
+    add_CurrentDate = Table.AddColumn(add_DaysToToday, "CurrentDate", each if [DaysToToday] = 0 then currentText else Date.ToText([Date], "dd/MM/yyyy"), type text),
+
+    #"-----YEAR-----" = "",    
+    add_Year = Table.AddColumn(add_CurrentDate, "Year", each Date.Year([Date]), Int64.Type),
+    add_YearStart = Table.AddColumn(add_Year, "YearStart", each Date.StartOfYear([Date]), type date),
+    add_YearEnd = Table.AddColumn(add_YearStart, "YearEnd", each Date.EndOfYear([Date]), type date),
+    add_YearIndex = Table.AddColumn(add_YearEnd, "YearIndex", each [Year] - startYear + 1, Int64.Type),
+    add_YearDescendingName = Table.AddColumn(add_YearIndex, "YearDescendingName", each [Year], Int64.Type),
+    add_YearDescendingNumber = Table.AddColumn(add_YearDescendingName, "YearDescendingNumber", each [Year] * -1, Int64.Type),
+    add_YearsToToday = Table.AddColumn(add_YearDescendingNumber, "YearsToToday", each [Year] - Date.Year(currentDate), Int64.Type),
+    add_CurrentYear = Table.AddColumn(add_YearsToToday, "CurrentYear", each if [YearsToToday] = 0 then currentText else Text.From([Year]), type text),
+
+    #"-----DAY-----" = "",
+    add_DayOfMonth = Table.AddColumn(add_CurrentYear, "DayOfMonth", each Date.Day([Date]), Int64.Type),
+    add_DayOfYear = Table.AddColumn(add_DayOfMonth, "DayOfYear", each Date.DayOfYear([Date]), Int64.Type),
+    add_DayOfWeekNumber = Table.AddColumn(add_DayOfYear, "DayOfWeekNumber", each Date.DayOfWeek([Date], startOfWeek), Int64.Type),
+    add_DayOfWeekName = Table.AddColumn(add_DayOfWeekNumber, "DayOfWeekName", each Text.Proper(Date.DayOfWeekName([Date], language)), type text),
+    add_DayOfWeekNameShort = Table.AddColumn(add_DayOfWeekName, "DayOfWeekNameShort", each Text.Start([DayOfWeekName], 3), type text),
+    add_DayOfWeekNameInitials = Table.AddColumn(add_DayOfWeekNameShort, "DayOfWeekNameInitials", each Text.Repeat(zws, 7-[DayOfWeekNumber]) & Text.Start([DayOfWeekName], 1), type text),
+
+    #"-----MONTH-----" = "",
+    add_MonthNumber = Table.AddColumn(add_DayOfWeekNameInitials, "MonthNumber", each Date.Month([Date]), Int64.Type),
+    add_MonthName = Table.AddColumn(add_MonthNumber, "MonthName", each Text.Proper(Date.MonthName([Date], language)), type text), 
+    add_MonthNameShort = Table.AddColumn(add_MonthName, "MonthNameShort", each Text.Start([MonthName], 3), type text), 
+    add_MonthNameInitials = Table.AddColumn(add_MonthNameShort, "MonthNameInitials", each Text.Repeat(zws, 12-[MonthNumber]) & Text.Start([MonthName], 1), type text),
+    add_MonthYearName = Table.AddColumn(add_MonthNameInitials, "MonthYearName", each Text.Proper(Date.ToText([Date], [Format="MMM/yy", Culture=language])), type text),
+    add_MonthYearNumber = Table.AddColumn(add_MonthYearName, "MonthYearNumber", each [Year] * 100 + [MonthNumber], Int64.Type),
+    add_MonthDayNumber = Table.AddColumn(add_MonthYearNumber, "MonthDayNumber", each [MonthNumber] * 100 + [DayOfMonth], Int64.Type),
+    add_MonthDayName = Table.AddColumn(add_MonthDayNumber, "MonthDayName", each [MonthNameShort] & " " & Text.From([DayOfMonth]), type text), 
+    add_MonthStart = Table.AddColumn(add_MonthDayName, "MonthStart", each Date.StartOfMonth([Date]), type date),
+    add_MonthEnd = Table.AddColumn(add_MonthStart, "MonthEnd", each Date.EndOfMonth([Date]), type date),
+    add_MonthIndex = Table.AddColumn(add_MonthEnd, "MonthIndex", each 12 * ([Year]-Date.Year(startDate)) + [MonthNumber], Int64.Type),
+    add_MonthsToToday = Table.AddColumn(add_MonthIndex, "MonthsToToday", each ([Year] * 12 - 1 + [MonthNumber]) - (currentYear * 12 - 1 + Date.Month(currentDate)), Int64.Type),
+    add_CurrentMonthName = Table.AddColumn(add_MonthsToToday, "CurrentMonthName", each if currentMonth = [MonthNumber] then currentText else [MonthName], type text),
+    add_CurrentMonthNameShort = Table.AddColumn(add_CurrentMonthName, "CurrentMonthNameShort", each if currentMonth = [MonthNumber] then currentText else [MonthNameShort], type text),
+    add_CurrentMonthYearName = Table.AddColumn(add_CurrentMonthNameShort, "CurrentMonthYearName", each if [MonthsToToday] = 0 then currentText else [MonthYearName], type text),
+
+    #"-----QUARTER-----" = "",
+    add_QuarterNumber = Table.AddColumn(add_CurrentMonthYearName, "QuarterNumber", each Date.QuarterOfYear([Date]), Int64.Type), 
+    add_QuarterName = Table.AddColumn(add_QuarterNumber, "QuarterName", each quarterPrefix & Text.From([QuarterNumber]), type text),
+    add_QuarterYearName = Table.AddColumn(add_QuarterName, "QuarterYearName", each [QuarterName] & " " & Text.End(Text.From([Year]), 2), type text),
+    add_QuarterYearNumber = Table.AddColumn(add_QuarterYearName, "QuarterYearNumber", each [Year] * 100 + [QuarterNumber], Int64.Type), 
+    add_QuarterStart = Table.AddColumn(add_QuarterYearNumber, "QuarterStart", each Date.StartOfQuarter([Date]), type date),
+    add_QuarterEnd = Table.AddColumn(add_QuarterStart, "QuarterEnd", each Date.EndOfQuarter([Date]), type date),
+    add_QuarterIndex = Table.AddColumn(add_QuarterEnd, "QuarterIndex", each 4 * ([Year] - Date.Year(startDate)) + [QuarterNumber], Int64.Type),
+    add_QuartersToToday = Table.AddColumn(add_QuarterIndex, "QuartersToToday", each ([Year] * 4 - 1 + [QuarterNumber]) - (currentYear * 4 - 1 + Date.QuarterOfYear(currentDate)), Int64.Type),
+    add_CurrentQuarter = Table.AddColumn(add_QuartersToToday, "CurrentQuarter", each if Date.QuarterOfYear(currentDate) = [QuarterNumber] then currentText else [QuarterName], type text),
+    add_CurrentQuarterYear = Table.AddColumn(add_CurrentQuarter, "CurrentQuarterYear", each if [QuartersToToday] = 0 then currentText else [QuarterYearName], type text),
+    add_MonthOfQuarterNumber = Table.AddColumn(add_CurrentQuarterYear, "MonthOfQuarterNumber", each Number.Mod([MonthNumber] - 1, 3) + 1, Int64.Type),
+
+    #"-----WEEK-----" = "",
+    add_WeekOfYearNumberISO = Table.AddColumn(
+        add_MonthOfQuarterNumber, 
+        "WeekOfYearNumberISO", 
+        each let
+            thursdayInWeek = Date.AddDays(
+                [Date],
+                3 - Date.DayOfWeek([Date], Day.Monday)
+            ),
+            startYearThursdayInWeek = #date(Date.Year(thursdayInWeek), 1, 1),
+            diffDays = Duration.Days(thursdayInWeek - startYearThursdayInWeek)
+        in
+            Number.IntegerDivide(diffDays, 7, 0) + 1,
+        Int64.Type
+    ),
+
+    add_YearISO = Table.AddColumn(add_WeekOfYearNumberISO, "YearISO", each Date.Year(Date.AddDays([Date], 26 - [WeekOfYearNumberISO])), Int64.Type),
+    add_WeekYearNumberISO = Table.AddColumn(add_YearISO, "WeekYearNumberISO", each [YearISO] * 100 + [WeekOfYearNumberISO], Int64.Type),
+    add_WeekYearNameISO = Table.AddColumn(add_WeekYearNumberISO, "WeekYearNameISO", each weekPrefix & Text.PadStart(Text.From([WeekOfYearNumberISO]), 2, "0") & " " & Text.From([YearISO]), type text),
+    add_WeekStartISO = Table.AddColumn(add_WeekYearNameISO, "WeekStartISO", each Date.StartOfWeek([Date], Day.Monday), type date), 
+    add_WeekEndISO = Table.AddColumn(add_WeekStartISO, "WeekEndISO", each Date.EndOfWeek([Date], Day.Monday), type date), 
+    add_WeekIndexISO = Table.AddColumn(add_WeekEndISO, "WeekIndexISO", each Number.From([WeekStartISO] - Date.StartOfWeek(startDate, Day.Monday)) / 7 + 1, Int64.Type),
+    add_WeeksToTodayISO = Table.AddColumn(add_WeekIndexISO, "WeeksToTodayISO", each Number.From([WeekStartISO] - Date.StartOfWeek(currentDate, Day.Monday)) / 7, Int64.Type),
+    add_CurrentWeekISO = Table.AddColumn(add_WeeksToTodayISO, "CurrentWeekISO", each if [WeeksToTodayISO] = 0 then currentText else [WeekYearNameISO], type text),
+    add_WeekPeriodName = Table.AddColumn(add_CurrentWeekISO, "WeekPeriodName", each [WeekYearNameISO] & ": " & Date.ToText([WeekStartISO], [Format="dd/MM/yyyy"]) & "~" & Date.ToText([WeekEndISO], [Format="dd/MM/yyyy"]), type text),
+    add_WeekOfMonthNumber = Table.AddColumn(add_WeekPeriodName, "WeekOfMonthNumber", each Date.WeekOfMonth([Date], startOfWeek), Int64.Type),
+    
+    #"-----HALF-----" = "",
+    add_HalfNumber = Table.AddColumn(add_WeekOfMonthNumber, "HalfNumber", each if [MonthNumber] <= 6 then 1 else 2, Int64.Type),
+    add_HalfYearName = Table.AddColumn(add_HalfNumber, "HalfYearName", each halfPrefix & Text.From([HalfNumber]) & " " & Text.From([Year]), type text),
+    add_HalfYearNumber = Table.AddColumn(add_HalfYearName, "HalfYearNumber", each [Year] * 100 + [HalfNumber], Int64.Type),
+    add_HalfIndex = Table.AddColumn(add_HalfYearNumber, "HalfIndex", each (2*([Year] - Date.Year(startDate))) + [HalfNumber], Int64.Type),
+    add_HalfsToToday = Table.AddColumn(add_HalfIndex, "HalfsToToday", each [HalfIndex] - ( 2 * ( currentYear - startYear ) + ( if currentMonth <= 6 then 1 else 2 )), Int64.Type),
+    add_CurrentHalf = Table.AddColumn(add_HalfsToToday, "CurrentHalf", each if [HalfsToToday] = 0 then currentText else [HalfYearName], type text), 
+
+    #"-----BIMESTER-----" = "",
+    add_BimesterNumber = Table.AddColumn(add_CurrentHalf, "BimesterNumber", each Number.RoundUp([MonthNumber]/ 2), Int64.Type),
+    add_BimesterYearName = Table.AddColumn(add_BimesterNumber, "BimesterYearName", each bimesterPrefix & Text.From([BimesterNumber]) & " " & Text.From([Year]), type text),
+    add_BimesterYearNumber = Table.AddColumn(add_BimesterYearName, "BimesterYearNumber", each [Year] * 100 + [BimesterNumber], Int64.Type),
+    add_BimesterIndex = Table.AddColumn(add_BimesterYearNumber, "BimesterIndex", each (6*([Year] - Date.Year(startDate))) + [BimesterNumber], Int64.Type),
+    add_BimestersToToday = Table.AddColumn(add_BimesterIndex, "BimestersToToday", each ( 6 * ( [Year] - startYear ) + [BimesterNumber])  - (( 6 * ( currentYear - startYear ) ) + Number.RoundUp ( currentMonth / 2, 0 )), Int64.Type),
+    add_CurrentBimester = Table.AddColumn(add_BimestersToToday, "CurrentBimester", each if [BimestersToToday] = 0 then currentText else [BimesterYearName], type text),
+
+    #"-----FORTNIGHT-----" = "",
+    add_FortnightOfMonthNumber = Table.AddColumn(add_CurrentBimester, "FortnightOfMonthNumber", each if [DayOfMonth] <= 15 then 1 else 2, Int64.Type),
+    add_FortnightMonthNumber = Table.AddColumn(add_FortnightOfMonthNumber, "FortnightMonthNumber", each [MonthNumber] * 10 + [FortnightOfMonthNumber], Int64.Type),
+    add_FortnightMonthName = Table.AddColumn(add_FortnightMonthNumber, "FortnightMonthName", each [MonthNameShort] & " " & Text.From([FortnightOfMonthNumber]), type text),
+    add_FortnightMonthYearNumber = Table.AddColumn(add_FortnightMonthName, "FortnightMonthYearNumber", each [Year] * 10000 + [MonthNumber] * 100 + [FortnightMonthNumber], Int64.Type),
+    add_FortnightMonthYearName = Table.AddColumn(add_FortnightMonthYearNumber, "FortnightMonthYearName", each fortnightPrefix & Text.From([FortnightOfMonthNumber]) & " " & [MonthNameShort] & " " & Text.From([Year]), type text),
+    add_FortnightIndex = Table.AddColumn(add_FortnightMonthYearName, "FortnightIndex", each 24 * ([Year] - Date.Year(startDate)) + 2 * ([MonthNumber]-Date.Month(startDate)) + [FortnightOfMonthNumber] , Int64.Type),
+    add_FortnightsToToday = Table.AddColumn(add_FortnightIndex, "FortnightsToToday", each [FortnightIndex] - ( (24 * (currentYear - Date.Year(startDate))) + (2 * (Date.Month(currentDate)-Date.Month(startDate))) + (if Date.Day(currentDate) <= 15 then 1 else 2)), Int64.Type),
+    add_CurrentFortnight = Table.AddColumn(add_FortnightsToToday, "CurrentFortnight", each if [FortnightsToToday] = 0 then currentText else [FortnightMonthName], type text),
+    
+    #"-----CLOSING-----" = "",
+    add_ClosingDateRef = Table.AddColumn(add_CurrentFortnight, "ClosingDateRef", each if [DayOfMonth] <= closingMonthStartDay then [Date] else Date.AddMonths([Date], 1), type date),
+    add_ClosingYear = Table.AddColumn(add_ClosingDateRef, "ClosingYear", each Date.Year([ClosingDateRef]), Int64.Type),
+    add_ClosingMonthName = Table.AddColumn(add_ClosingYear, "ClosingMonthName", each Text.Proper(Date.MonthName([ClosingDateRef], language)), type text),
+    add_ClosingMonthNameShort = Table.AddColumn(add_ClosingMonthName, "ClosingMonthNameShort", each Text.Start([ClosingMonthName], 3), type text), 
+    add_ClosingMonthNumber = Table.AddColumn(add_ClosingMonthNameShort, "ClosingMonthNumber", each Date.Month([ClosingDateRef]), Int64.Type),
+    add_ClosingMonthYearName = Table.AddColumn(add_ClosingMonthNumber, "ClosingMonthYearName", each [ClosingMonthNameShort] & "/" & Text.End(Text.From([ClosingYear]), 2), type text), 
+    add_ClosingMonthYearNumber = Table.AddColumn(add_ClosingMonthYearName, "ClosingMonthYearNumber", each [ClosingYear] * 100 + [ClosingMonthNumber], Int64.Type),
+
+    #"-----SEASONS-----" = "",
+    add_SeasonNorthNumber = Table.AddColumn(
+        add_ClosingMonthYearNumber, 
+        "SeasonNorthNumber", 
+        each if [MonthDayNumber] >= 321 and [MonthDayNumber] <= 620  then 1 else 
+                if [MonthDayNumber] >= 621 and [MonthDayNumber] <= 921  then 2 else 
+                if [MonthDayNumber] >= 922 and [MonthDayNumber] <= 1221 then 3 else 4,
+        Int64.Type
+    ),
+
+    add_SeasonNorthName = Table.AddColumn(
+        add_SeasonNorthNumber, 
+        "SeasonNorthName", 
+        each if [SeasonNorthNumber] = 1 then springText else 
+                if [SeasonNorthNumber] = 2 then summerText else 
+                if [SeasonNorthNumber] = 3 then autumnText else winterText, 
+        type text
+    ),
+
+    add_SeasonSouthNumber = Table.AddColumn(
+        add_SeasonNorthName, 
+        "SeasonSouthNumber", 
+        each if [MonthDayNumber] >= 321 and [MonthDayNumber] <= 620  then 1 else 
+                if [MonthDayNumber] >= 621 and [MonthDayNumber] <= 921  then 2 else 
+                if [MonthDayNumber] >= 922 and [MonthDayNumber] <= 1221 then 3 else 4,
+        Int64.Type
+    ),
+
+    add_SeasonSouthName = Table.AddColumn(
+        add_SeasonSouthNumber, 
+        "SeasonSouthName", 
+        each if [SeasonNorthNumber] = 1 then autumnText else 
+                if [SeasonNorthNumber] = 2 then winterText else 
+                if [SeasonNorthNumber] = 3 then springText else summerText, 
+        type text
+    ),
+
+    #"-----BUSINESS-----" = "",
+    add_Holiday = Table.RenameColumns(Table.RemoveColumns(Table.Join(add_SeasonSouthName, "Date", Table.PrefixColumns(holidays, "h"), "h.Date", JoinKind.LeftOuter, JoinAlgorithm.LeftIndex), "h.Date"), {{"h.Holiday", "Holiday"}}),
+    add_BusinessDayNumber = Table.AddColumn(add_Holiday, "BusinessDayNumber", each if [Holiday] <> null or Date.DayOfWeek([Date], Day.Monday) > 4 then 0 else 1, Int64.Type),
+    add_BusinessDayName = Table.AddColumn(add_BusinessDayNumber, "BusinessDayName", each if [BusinessDayNumber] = 1 then businessDayText else nonBusinessDayText, type text),
+
+
+    #"-----FISCAL COLUMNS-----" = "", 
+    #"-----FISCAL YEAR-----" = "", 
+    add_FiscalYearStartNumber = Table.AddColumn(add_BusinessDayName, "FiscalYearStartNumber", each Date.Year(Date.AddMonths([Date], -monthOfFiscalYearEnd)), Int64.Type),
+    add_FiscalYearEndNumber = Table.AddColumn(add_FiscalYearStartNumber, "FiscalYearEndNumber", each [FiscalYearStartNumber] + 1, Int64.Type),
+    add_FiscalYear = Table.AddColumn(add_FiscalYearEndNumber, "FiscalYear", each "FY " & Text.From([FiscalYearStartNumber]) & "-" &Text.From([FiscalYearEndNumber]), type text),
+    add_FiscalYearStart = Table.AddColumn( add_FiscalYear, "FiscalYearStart", each #date( [FiscalYearStartNumber], if monthOfFiscalYearEnd = 12 then 1 else  monthOfFiscalYearEnd + 1 , 1), type date ),
+    add_FiscalYearEnd = Table.AddColumn( add_FiscalYearStart, "FiscalYearEnd", each Date.EndOfMonth(#date([FiscalYearEndNumber], monthOfFiscalYearEnd, 1)), type date),
+    add_CurrentFiscalYear = Table.AddColumn(add_FiscalYearEnd, "CurrentFiscalYear", each if [FiscalYearStartNumber] = currentFiscalYear then currentText else [FiscalYear], type text),
+    add_FiscalYearsToToday = Table.AddColumn(add_CurrentFiscalYear, "FiscalYearsToToday", each [FiscalYearStartNumber] - currentFiscalYear, Int64.Type),
+    
+    #"-----FISCAL MONTH-----" = "", 
+    add_FiscalMonthNumber = Table.AddColumn(add_FiscalYearsToToday, "FiscalMonthNumber", each Date.Month( Date.AddMonths([Date], - monthOfFiscalYearEnd ) ), Int64.Type),
+    add_FiscalMonthName = Table.AddColumn( add_FiscalMonthNumber, "FiscalMonthName", each Text.Proper(Date.ToText([Date], [Format="MMMM", Culture = language])), type text ),
+    add_FiscalMonthNameShort = Table.AddColumn(add_FiscalMonthName, "FiscalMonthNameShort", each Text.Start([FiscalMonthName], 3), type text),
+    add_CurrentFiscalMonth = Table.AddColumn( add_FiscalMonthNameShort, "CurrentFiscalMonth", each if Date.IsInCurrentMonth([Date]) then currentText else [FiscalMonthName], Text.Type),
+    add_FiscalYearMonthName = Table.AddColumn(add_CurrentFiscalMonth, "FiscalYearMonthName", each [FiscalMonthNameShort] & " " & [FiscalYear], type text),
+    add_FiscalYearMonthNumber = Table.AddColumn( add_FiscalYearMonthName, "FiscalYearMonthNumber", each [FiscalYearStartNumber] * 100 + [FiscalMonthNumber], Int64.Type ),
+    add_FiscalYearMonthCurrent = Table.AddColumn( add_FiscalYearMonthNumber, "FiscalYearMonthCurrent", each if [CurrentFiscalYear] = currentText and [CurrentFiscalMonth] = currentText then currentText else [FiscalYearMonthName], type text),
+    add_FiscalMonthsToToday = Table.AddColumn(add_FiscalYearMonthCurrent, "FiscalMonthsToToday", each [ CurrentFiscalMonth = Date.Month( Date.AddMonths( currentDate, - monthOfFiscalYearEnd ) ), FiscalQuartersToToday = (([FiscalYearStartNumber] - currentFiscalYear) * 12) + ([FiscalMonthNumber] - CurrentFiscalMonth)][FiscalQuartersToToday], Int64.Type ),
+    
+    #"-----FISCAL QUARTER-----" = "", 
+    add_FiscalQuarterNumber = Table.AddColumn(add_FiscalMonthsToToday, "FiscalQuarterNumber", each Number.RoundUp( [FiscalMonthNumber] / 3), Int64.Type),
+    add_FiscalQuarterName = Table.AddColumn(add_FiscalQuarterNumber, "FiscalQuarterName", each "FQ " & Text.From([FiscalQuarterNumber]), Text.Type),
+    add_FiscalMonthOfQuarterNumber = Table.AddColumn(add_FiscalQuarterName, "FiscalMonthOfQuarterNumber", each [FiscalMonthNumber] - 3 * ([FiscalQuarterNumber] - 1) , Int64.Type ),
+    add_FiscalYearQuarterName = Table.AddColumn(add_FiscalMonthOfQuarterNumber, "FiscalYearQuarterName", each [FiscalQuarterName] & " | " & [FiscalYear], type text),
+    add_FiscalYearQuarterNumber = Table.AddColumn(add_FiscalYearQuarterName, "FiscalYearQuarterNumber", each [FiscalYearStartNumber] * 100 + [FiscalQuarterNumber], Int64.Type),
+    add_FiscalQuarterStart = Table.AddColumn(add_FiscalYearQuarterNumber, "FiscalQuarterStart", each Date.StartOfMonth( Date.AddMonths( [Date] , 1-[FiscalMonthOfQuarterNumber] )), Date.Type),
+    add_FiscalQuarterEnd = Table.AddColumn(add_FiscalQuarterStart, "FiscalQuarterEnd", each Date.EndOfMonth( Date.AddMonths( [Date] , 3-[FiscalMonthOfQuarterNumber] )), Date.Type),
+    add_FiscalQuartersToToday = Table.AddColumn(
+        add_FiscalQuarterEnd, 
+        "FiscalQuartersToToday", 
+        each [
+            CurrentFiscalMonth = Date.Month(Date.AddMonths(currentDate, - monthOfFiscalYearEnd)),  
+            CurrentFiscalQuarter = Number.RoundUp(CurrentFiscalMonth / 3),
+            FiscalQuartersToToday = (([FiscalYearStartNumber] - currentFiscalYear) * 4) + ([FiscalQuarterNumber] - CurrentFiscalQuarter)
+        ][FiscalQuartersToToday], 
+        Int64.Type 
+    ),
+    add_CurrentFiscalQuarter = Table.AddColumn(add_FiscalQuartersToToday, "CurrentFiscalQuarter", each if [FiscalQuartersToToday] = 0 then currentText else [FiscalYearQuarterName], type text),
+    add_DayOfFiscalQuarter = Table.AddColumn(add_CurrentFiscalQuarter, "DayOfFiscalQuarter", each Number.From( [Date] - [FiscalQuarterStart] ) + 1, Int64.Type ),
+
+    #"-----RENAME COLUMNS----" = "",
+    columnNamesDictionary = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("jVjbbtw4DP2XPPcnMpkGCdAm7U6KYlHkQXGUxrseC7A9xWa/fnUjeURx0n2ZkY54aIo6omz9+HGxd5u/+JD+XPy79sOru3j8UPDb+dn/Uwdjexw8mdReMXxbH8JDeHZvyXR06xe3uJvwl6/dG7dusf+Wra9Oy+LnDZ56uZ3cRH4vh9xLln96t0T4cg71l8DD5patYLfzOIyhaZPVx/m54NfjkRozj9LMMq9OTNpktffr4CM0/7xzx2qy98OS4c3fBQGzYQWfFtPF6fjkl97J6eiXAPAwAkxuIMPRDjOculaGJX2U4NSU9MZlu3/5HObttSzTPnz2a236KbXZqrrKRmU5ihEtSjb67v3fPMU07g7+6GbH88ucTy3askuOkRsYEabkt2EeXkNWhaJfRuNfo3vuI8h+riLJCCNqaRvdtPb+ssrcuNruyuhUk5ezyzmJKeVcSFvsyuzTSIAWzZVtaJ7VEOfHDJkV02BGlQkzYaIRf1p8iS0uuYRXOk2E2RpmnExg0tJlRsw7EmJSkSDdhsDxpPHQdpp4qFbEUa4V0mazUiziQCkWuTHLMFWLzKzVQtpsBps0jnrcpblvbVO19nmvQoaH2qdJaRaogalKEuhDhIGOuiXWUVDhgEC+nmJivaz1wzIe/botUs80gqzyMLEIRh/sIUC2ESUqSEXYKLIx7QJt1Vn5pCC2Yh1pBEhFT2xQVAXdGY1JXeCvaqwiHoRWOSA1pqHeBLREV500c6+HhAByVLSsehpg1npyc9Rkkd2/aMmkHRt63STYT5Z6UnUup1HxcXu4j/al/uaTqdg2cD6lBOfzP9ukEx8b9BD7EeYDOu/MT0VXGQYLSmUXuFlvaFXUZSNEinpDg6i3tjujcdZb6y/JC5GRESKR4NCKBdeAJDhiV/XkJ+PkkzwaYCCEnvnFL2N4rhu/GBWIdr7GaOsXobTHL8kEj2HWSHse37jpBXmtPhVABKhRZCElqkUoTKbpZ2F16jGiUt0gCy4bCiB7qBlkgSWDMatiJD4GUzc892Wz70rJkknt9Abf9TubSJDEXVfnd2aZb6j6mZjIHkM6JXOna7ACkAMJ3Rk1ePdeCSYfGFhN6q6vwNfx3J7Hn6+bVvXX0zj/67WuEzp4Q9nsx/Zi+XjXQVkqpAdGBkZoqVpys2DgAtcM/LTLZrjqYhHlKDdGRLT8ROflJyosP5Ng/YmH609Uc/3ZCZBJAETEI3gKa/yGTJ/Nf/i0E9OX897nb+ZjdBcKmvt7fzX6+JAEAVc+CIVV+sUcbdVbqRDkpbCQ8NVUUeHVtOWr91N0BO+n6A3eGMAVvDBUH6IPpHevt9Z0OA1nZmR82NihiCOJ5uDdGua7ODmZy8eoicGFBEppNEDNLxNpDIMF0SQK9xBO/bMPp0k/WSDNbZ6bzEIP8MEWprHsi+t4NvPH93Usa+OvWndPMbV+XfHzL5p820aJKfY/uaewuKepOSyAylcGmcjXBUKDvT6ug5v4AgmvY8pQ/fjFCxlroPUV37x6T/GFy/KDcOsFrUr7pbSNwLvI+liNINs4jiqspjKZUcElUgXgdGKGuqbKA6O+rSrm6lgsYL/dM4z7q0E0UypWsQpdv1WDWayYqgoV+ug+pMEfWlPaBLDSpi8BKMdNeTozBeGr6tRlToOGjzoZZQ+TOL/85g1ILwCBbQWcvVdQ87Hx3o+6NWjy2qOGOn733drnGb9e30l4G2FMrB2kOdBLQAdp0KAe/c/sdXcfquoQnmqIWXzOXYdIFerAuaeblx29tNSY1lezUY0bkFbrGlYX59pLvhtXnAu6J9f44+N/", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"en-US" = _t, #"pt-BR" = _t, #"es-ES" = _t]),
+    
+    fromToColumnNames = if language <> "en-US" then List.Zip(Table.ToColumns(Table.SelectColumns(columnNamesDictionary, {"en-US", language}))) else null,
+    renamedColumns = if language <> "en-US" then Table.RenameColumns(add_DayOfFiscalQuarter, fromToColumnNames) else add_DayOfFiscalQuarter
 in
-    adDiaUtilMes 
-
-in dCalendario 
-
-    //Fim
+    renamedColumns
