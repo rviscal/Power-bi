@@ -1,0 +1,7 @@
+    SWITCH(
+        TRUE(),
+        vTotalVendas >= 1000000000, FORMAT ( vTotalVendas, "R$ #,0,,,.00 Bi" ),
+        vTotalVendas >= 1000000, FORMAT ( vTotalVendas, "R$ #,0,,.00 Mi" ),
+        vTotalVendas >= 1000, FORMAT ( vTotalVendas, "R$ #,0,.00 k" ),
+        FORMAT ( vTotalVendas, "R$ #,##0.00" )
+    )
