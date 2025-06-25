@@ -1,0 +1,8 @@
+    vDia & UNICHAR(10) & 
+    vTotalVendasFormatada & UNICHAR(10) & 
+    vTotalContasPagarFormatado & UNICHAR(10) &
+    REPT(UNICHAR(8213),5) & UNICHAR(10) &
+
+    UNICHAR(10) =  quebra de linha
+    REPT(UNICHAR(8213),5) =  repete o unichar 5 vezes esse unichar e o -
+    
