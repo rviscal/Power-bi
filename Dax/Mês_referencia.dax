@@ -1,0 +1,10 @@
+Mes Referencia = 
+VAR DataUltimaCarga = CALCULATE(MAX('PF - PROFISSIONAL'[DataComp]), ALL('PF - PROFISSIONAL'))
+VAR MesReferenciaBase = EOMONTH(DataUltimaCarga, -1) + 1 
+VAR MesLinhaCalendario = EOMONTH('Calendario'[Data], -1) + 1
+
+RETURN
+    IF(
+        MesReferenciaBase = MesLinhaCalendario, 
+        'Calendario'[Nome_Mes] & "*",  
+        'Calendario'[Nome_Mes]  
