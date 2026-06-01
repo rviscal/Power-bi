@@ -1,0 +1,48 @@
+// ========================================
+// MODO DE APLICAR - TEMAS DINÂMICOS
+// ========================================
+
+Siga o passo a passo abaixo na ordem exata dos arquivos para implementar a troca de temas dinâmicos no seu relatório do Power BI.
+
+## Passo 1: Adicionar as Funções DAX (Arquivo 1_)
+1. No menu lateral esquerdo do Power BI, clique no ícone da **Exibição de Consulta DAX** (o ícone com o símbolo "DAX" em cima de uma folha).
+2. Abra o arquivo `1_Função.txt` e copie todo o código (ele contém as 21 funções necessárias para gerar os visuais em SVG).
+3. Cole o código na área de consulta.
+4. Execute/Atualize a consulta para que o Power BI registre todas as funções no seu modelo.
+
+---
+
+## Passo 2: Criar a Tabela de Temas (Arquivo 2_)
+1. No Power BI, vá na guia **Modelagem** e clique em **Nova Tabela**.
+2. Abra o arquivo `2_Tabela.txt`, copie todo o código e cole na barra de fórmulas.
+3. Aperte Enter para confirmar. Isso criará a base de dados com todos os temas e suas configurações.
+
+---
+
+## Passo 3: Criar as Medidas (Arquivo 3_)
+1. Abra o arquivo `3_Medidas.txt`.
+2. Crie uma nova medida no Power BI para cada bloco de código disponível no arquivo.
+3. Você deverá criar a medida base (`_TemaSelecionado`), a paleta em texto (`_PaletaTema`) e as medidas individuais de cores (`_CorTema1` até `_CorTema5`). 
+
+---
+
+## Passo 4: Configurar o Filtro Visual (Slicer)
+Para que o usuário consiga trocar os temas e ver as cores no próprio filtro:
+1. Adicione um visual de **Segmentação de Dados** (Filtro) no seu painel.
+2. Arraste a coluna **Nome Exibição** ou **Nome Tema** (da sua tabela ThemeSelector) para o filtro.
+3. Selecione o filtro, vá no rolo de pintura (Formatar visual) e procure pela configuração de **Imagens**.
+4. Ative a URL da imagem e aponte para a coluna **VisualizacaoMini**. 
+5. Ajuste o tamanho e o layout do filtro. Agora você conseguirá ver todas as miniaturas das paletas de cores direto na tela!
+
+---
+
+## Passo 5: Colorir os Gráficos
+Agora é só conectar as cores aos seus gráficos:
+1. Selecione o gráfico que deseja colorir.
+2. Vá em **Formatar visual** > **Cores** (ou Barras/Colunas, dependendo do gráfico).
+3. Em vez de escolher uma cor fixa, clique no botão **"fx"** (Formatação Condicional).
+4. Em "Estilo de formato", escolha **Valor do campo**.
+5. Em "Em qual campo devemos basear isso?", selecione a medida da cor que você quer aplicar (Ex: `_CorTema1`).
+6. Repita o processo para os outros gráficos, alternando as medidas (`_CorTema2`, `_CorTema3`, etc.) para criar a sequência visual desejada.
+
+Pronto! Ao clicar no filtro, todos os gráficos formatados com o "fx" mudarão de cor automaticamente.

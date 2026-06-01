@@ -1,0 +1,47 @@
+// ========================================
+// PASSO 1
+// ========================================
+
+ThemeSelector = 
+ADDCOLUMNS(
+    DATATABLE(
+        "ThemeID", INTEGER,
+        "ThemeName", STRING,
+        "DisplayName", STRING,
+        "Icon", STRING,
+        "Category", STRING,
+        "Description", STRING,
+        {
+            {1, "corporate", "🏢 Corporate", "🏢", "Professional", "Blue professional theme"},
+            {3, "ocean", "🌊 Ocean", "🌊", "Nature", "Sea and water tones"},
+            {17, "sunset", "🌅 Sunset", "🌅", "Warm", "Warm orange and pink"},
+            {4, "forest", "🌲 Forest", "🌲", "Nature", "Natural green tones"},
+            {5, "purple", "👑 Purple", "👑", "Elegant", "Royal purple elegance"},
+            {6, "monochrome", "⚫ Monochrome", "⚫", "Minimal", "Black and white"},
+            {7, "vibrant", "🎨 Vibrant", "🎨", "Bold", "Bright and bold colors"},
+            {8, "pastel", "🍬 Pastel", "🍬", "Soft", "Soft pastel colors"},
+            {9, "dark", "🌙 Dark", "🌙", "Dark", "Dark mode colors"},
+            {10, "earth", "🌍 Earth", "🌍", "Natural", "Earth tone colors"},
+            {11, "candy", "🍭 Candy", "🍭", "Fun", "Sweet candy colors"},
+            {12, "tech", "💻 Tech", "💻", "Modern", "Technology theme"},
+            {13, "autumn", "🍂 Autumn", "🍂", "Seasonal", "Fall colors"},
+            {14, "winter", "❄️ Winter", "❄️", "Seasonal", "Cool winter tones"},
+            {15, "tropical", "🏝️ Tropical", "🏝️", "Vibrant", "Tropical paradise"},
+            {16, "darkmode", "🌚 Dark Mode", "🌚", "Accessibility", "True dark mode"},
+            {2, "colorblind", "♿ Colorblind", "♿", "Accessibility", "Accessible for colorblind"}
+        }
+    ),
+    "Preview", ThemeLibrary([ThemeName], "svg"),
+    "PreviewMini", 
+        VAR Palette = ThemeLibrary([ThemeName], "string")
+        VAR C1 = LEFT(Palette, SEARCH("|", Palette) - 1)
+        VAR R1 = MID(Palette, SEARCH("|", Palette) + 1, 1000)
+        VAR C2 = LEFT(R1, SEARCH("|", R1) - 1)
+        VAR R2 = MID(R1, SEARCH("|", R1) + 1, 1000)
+        VAR C3 = LEFT(R2, SEARCH("|", R2) - 1)
+        VAR R3 = MID(R2, SEARCH("|", R2) + 1, 1000)
+        VAR C4 = LEFT(R3, SEARCH("|", R3) - 1)
+        VAR C5 = MID(R3, SEARCH("|", R3) + 1, 20)
+        RETURN MiniPreviewSVG(C1, C2, C3, C4, C5),
+    "ColorPalette", ThemeLibrary([ThemeName], "string")
+)

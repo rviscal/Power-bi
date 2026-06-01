@@ -1,0 +1,73 @@
+/* ====================================================================
+PASSO A PASSO: COMO EXECUTAR ESTE CÓDIGO
+====================================================================
+1. No menu lateral esquerdo do Power BI, clique no ícone "DAX" (Exibição de Consulta DAX).
+2. Na janela de consulta que se abrir (Query 1), apague qualquer texto e cole todo este código.
+3. Clique no botão verde "▶ Run" (Executar) na parte superior da tela.
+4. O botão "Update model with changes" (Atualizar modelo com alterações) ficará habilitado. 
+   Clique nele para salvar definitivamente todas as 7 medidas na tabela ThemeSelector.
+Pronto! As medidas já estarão disponíveis no seu painel de dados.
+==================================================================== */
+
+// ========================================
+// MEDIDAS DE TEMA E CORES
+// ========================================
+
+DEFINE 
+    MEASURE ThemeSelector[_TemaSelecionado] = 
+        SELECTEDVALUE(ThemeSelector[ThemeName], "corporate")
+    
+    MEASURE ThemeSelector[_PaletaTema] = 
+        ThemeLibrary([_TemaSelecionado], "string")
+    
+    MEASURE ThemeSelector[_CorTema1] = 
+        VAR Palette = [_PaletaTema]
+        RETURN LEFT(Palette, SEARCH("|", Palette) - 1)
+        
+    MEASURE ThemeSelector[_CorTema2] = 
+        VAR Palette = [_PaletaTema]
+        VAR R1 = MID(Palette, SEARCH("|", Palette) + 1, 1000)
+        RETURN LEFT(R1, SEARCH("|", R1) - 1)
+        
+    MEASURE ThemeSelector[_CorTema3] = 
+        VAR Palette = [_PaletaTema]
+        VAR R1 = MID(Palette, SEARCH("|", Palette) + 1, 1000)
+        VAR R2 = MID(R1, SEARCH("|", R1) + 1, 1000)
+        RETURN LEFT(R2, SEARCH("|", R2) - 1)
+        
+    MEASURE ThemeSelector[_CorTema4] = 
+        VAR Palette = [_PaletaTema]
+        VAR R1 = MID(Palette, SEARCH("|", Palette) + 1, 1000)
+        VAR R2 = MID(R1, SEARCH("|", R1) + 1, 1000)
+        VAR R3 = MID(R2, SEARCH("|", R2) + 1, 1000)
+        RETURN LEFT(R3, SEARCH("|", R3) - 1)
+        
+    MEASURE ThemeSelector[_CorTema5] = 
+        VAR Palette = [_PaletaTema]
+        VAR R1 = MID(Palette, SEARCH("|", Palette) + 1, 1000)
+        VAR R2 = MID(R1, SEARCH("|", R1) + 1, 1000)
+        VAR R3 = MID(R2, SEARCH("|", R2) + 1, 1000)
+        RETURN MID(R3, SEARCH("|", R3) + 1, 20)
+
+/* ====================================================================
+EXPLICAÇÃO: O QUE FAZEM AS MEDIDAS "_CorTema" (Theme Color)?
+====================================================================
+
+A medida [_PaletaTema] retorna um texto único contendo todas as 5 
+cores do tema selecionado, separadas por uma barra vertical ("|"). 
+Exemplo: "#0D47A1|#1565C0|#1976D2|#42A5F5|#90CAF9"
+
+O que as medidas de _CorTema1 a _CorTema5 fazem é "fatiar" esse 
+texto para extrair cada código de cor (HEX) separadamente. 
+
+Elas usam as funções de texto do DAX (SEARCH para encontrar o símbolo "|", 
+e LEFT/MID para cortar o texto). 
+- A _CorTema1 pega a primeira cor antes da primeira barra.
+- A _CorTema2 corta a primeira cor e pega a cor antes da segunda barra.
+- E assim por diante, até a _CorTema5.
+
+Isso permite que você aplique cada medida individualmente em diferentes 
+elementos do seu relatório no Power BI (ex: fundo do gráfico, cor da fonte, 
+bordas) usando a formatação condicional baseada no valor do campo (Field Value).
+Assim, quando o usuário muda o tema, todas as cores mudam dinamicamente!
+*/
