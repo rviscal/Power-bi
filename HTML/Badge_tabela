@@ -1,0 +1,54 @@
+Badge_Maturidade_SVG = 
+// =========================================================
+// 1. CAPTURAR O VALOR
+// =========================================================
+VAR vValorAtual = COALESCE([Maturidade do Indicador], "Em Branco") 
+
+// =========================================================
+// 2. DEFINIR CORES DE FUNDO 
+// =========================================================
+VAR vCorFundo = 
+    SWITCH(vValorAtual,
+        "Platina", "%23ACB0AC",
+        "Ouro", "%23D4AF37",    
+        "Prata", "%23C0C0C0",   
+        "Bronze", "%23CE8946",  
+        "Em Análise", "%23E2E8F0", // Cinza bem claro e suave
+        "Em Analize", "%23E2E8F0", 
+        "Em Branco", "%23E2E8F0",  // Cinza bem claro e suave
+        "transparent"         
+    )
+
+// =========================================================
+// 3. DEFINIR CORES DO TEXTO 
+// =========================================================
+VAR vCorTexto = 
+    SWITCH(vValorAtual,
+        "Platina", "%23FFFFFF", 
+        "Ouro", "%23FFFFFF",    
+        "Prata", "%23FFFFFF",   
+        "Bronze", "%23FFFFFF",  
+        "Em Análise", "%23475569", // Texto cinza escuro para leitura confortável
+        "Em Analize", "%23475569", 
+        "Em Branco", "%23475569", 
+        "%2394A3B8"             
+    )
+
+VAR vTexto = vValorAtual 
+
+// =========================================================
+// 4. DESENHAR A PÍLULA EM SVG
+// =========================================================
+// Foi adicionado o atributo letter-spacing='1.5px' na linha de texto abaixo
+VAR vSVG = 
+    "data:image/svg+xml;utf8," & 
+    "<svg xmlns='http://www.w3.org/2000/svg' width='110' height='26'>
+        <rect x='0' y='0' width='110' height='26' rx='13' fill='" & vCorFundo & "' />
+        <text x='55' y='18' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='14px' font-weight='bold' letter-spacing='1.5px' fill='" & vCorTexto & "'>" & vTexto & "</text>
+    </svg>"
+
+// =========================================================
+// 5. RETORNO
+// =========================================================
+RETURN
+    vSVG
