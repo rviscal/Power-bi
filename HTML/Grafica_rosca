@@ -1,0 +1,178 @@
+GraficoRosca_HTML = 
+// =========================================================
+// 1. INSIRA SUAS MEDIDAS AQUI
+// =========================================================
+VAR vValPublico = SUM('ED_001 (2)'[PUBLICA])
+VAR vValPrivado = SUM('ED_001 (2)'[PRIVADA])
+
+// Cores
+VAR vCorPublico = "#121682" // Azul Escuro
+VAR vCorPrivado = "#188FFF" // Azul Claro
+
+// =========================================================
+// 2. CÁLCULOS MATEMÁTICOS E DE PORCENTAGEM
+// =========================================================
+VAR vTotal = vValPublico + vValPrivado
+
+VAR vPercPublico = IF(vTotal = 0, 0, DIVIDE(vValPublico, vTotal))
+VAR vPercPrivado = IF(vTotal = 0, 0, DIVIDE(vValPrivado, vTotal))
+
+VAR vPercPublicoCSS = SUBSTITUTE(FORMAT(vPercPublico * 100, "0.00"), ",", ".") & "%"
+
+VAR vTxtPublico = FORMAT(vValPublico, "#,##0") & " (" & FORMAT(vPercPublico, "0.00%") & ")"
+VAR vTxtPrivado = FORMAT(vValPrivado, "#,##0") & " (" & FORMAT(vPercPrivado, "0.00%") & ")"
+
+// =========================================================
+// 3. CSS MODERNO E ANIMADO
+// =========================================================
+VAR vCSS = "
+<style>
+    .container-rosca {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100%;
+        font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+        box-sizing: border-box;
+        cursor: default !important; 
+        padding-top: 10px;
+    }
+
+    .area-grafico {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 320px; 
+        height: 160px;
+    }
+
+    /* Desenho da Rosca com Sombra Externa e Animação */
+    .rosca {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: conic-gradient(" & vCorPublico & " 0% " & vPercPublicoCSS & ", " & vCorPrivado & " " & vPercPublicoCSS & " 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15); /* Sombra 3D Premium */
+        opacity: 0;
+        animation: popIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Animação de entrada com 'efeito mola' */
+    }
+
+    /* O furo branco com Sombra Interna (Profundidade) */
+    .furo {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #FFFFFF; 
+        box-shadow: inset 0px 4px 10px rgba(0, 0, 0, 0.15); /* Sombra interna */
+    }
+
+    /* Rótulos Flutuantes com Animação Deslizante */
+    .rotulo {
+        position: absolute;
+        font-size: 11px;
+        font-weight: 600;
+        color: #475569; /* Cinza chumbo moderno */
+        white-space: nowrap;
+        opacity: 0; /* Fica invisível até a animação começar */
+    }
+
+    .rotulo-publico {
+        left: 0;
+        bottom: 25px;
+        border-right: 2px solid #E2E8F0; 
+        padding-right: 8px;
+        animation: slideDaEsquerda 0.6s ease-out 0.5s forwards; /* Atraso de 0.5s para esperar o gráfico nascer */
+    }
+
+    .rotulo-privado {
+        right: 0;
+        top: 25px;
+        border-left: 2px solid #E2E8F0; 
+        padding-left: 8px;
+        animation: slideDaDireita 0.6s ease-out 0.5s forwards; /* Atraso de 0.5s */
+    }
+
+    /* Legenda Inferior com Animação de Subida */
+    .area-legenda {
+        display: flex;
+        gap: 20px;
+        margin-top: 30px;
+        opacity: 0;
+        animation: subirOpacidade 0.6s ease-out 0.8s forwards; /* Atraso de 0.8s (Aparece por último) */
+    }
+
+    .item-legenda {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748B;
+    }
+
+    .bolinha {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        box-shadow: 0px 2px 4px rgba(0,0,0,0.2); /* Micro-sombra nas bolinhas */
+    }
+
+    /* ==================================== */
+    /* KEYFRAMES DAS ANIMAÇÕES */
+    /* ==================================== */
+    @keyframes popIn {
+        from { opacity: 0; transform: scale(0.5) rotate(-15deg); }
+        to { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+    
+    @keyframes slideDaEsquerda {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideDaDireita {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes subirOpacidade {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+"
+
+// =========================================================
+// 4. ESTRUTURA HTML FINAL
+// =========================================================
+VAR vHTML = "
+<div class='container-rosca'>
+    <div class='area-grafico'>
+        <div class='rotulo rotulo-publico'>" & vTxtPublico & "</div>
+        
+        <div class='rosca'>
+            <div class='furo'></div>
+        </div>
+        
+        <div class='rotulo rotulo-privado'>" & vTxtPrivado & "</div>
+    </div>
+
+    <div class='area-legenda'>
+        <div class='item-legenda'>
+            <div class='bolinha' style='background-color: " & vCorPrivado & ";'></div> Privado
+        </div>
+        <div class='item-legenda'>
+            <div class='bolinha' style='background-color: " & vCorPublico & ";'></div> Público
+        </div>
+    </div>
+</div>
+"
+
+RETURN
+    vCSS & vHTML

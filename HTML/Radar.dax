@@ -1,0 +1,89 @@
+Grafico_Radar_9_Eixos = 
+// =======================================================
+// 1. CONTROLES DE DESIGN
+// =======================================================
+VAR v_TempoAnimacao = "1.5s"      
+VAR v_CorPrimaria   = "#30468B"   
+VAR v_CorSecundaria = "#1E40AF"   
+
+// =======================================================
+// 2. DADOS
+// =======================================================
+VAR Nota_EIT  = [Nota Final EIxo Economia]
+VAR Nota_ECL  = [Nota Final EIxo Educação]
+VAR Nota_GF   = [Nota Final EIxo Governança]
+VAR Nota_HDU  = [Nota Final EIxo Habitação]
+VAR Nota_IUEC = [Nota Final EIxo Infraestrutura]
+VAR Nota_MSSA = [Nota Final EIxo Meio Ambiente]
+VAR Nota_SBIS = [Nota Final EIxo Saude]
+VAR Nota_SPPC = [Nota Final EIxo Segurança]
+VAR Nota_TMU  = [Nota Final EIxo Transporte]
+
+VAR MaxScore = 100
+VAR v_EIT  = DIVIDE(Nota_EIT,  MaxScore, 0)
+VAR v_ECL  = DIVIDE(Nota_ECL,  MaxScore, 0)
+VAR v_GF   = DIVIDE(Nota_GF,   MaxScore, 0)
+VAR v_HDU  = DIVIDE(Nota_HDU,  MaxScore, 0)
+VAR v_IUEC = DIVIDE(Nota_IUEC, MaxScore, 0)
+VAR v_MSSA = DIVIDE(Nota_MSSA, MaxScore, 0)
+VAR v_SBIS = DIVIDE(Nota_SBIS, MaxScore, 0)
+VAR v_SPPC = DIVIDE(Nota_SPPC, MaxScore, 0)
+VAR v_TMU  = DIVIDE(Nota_TMU,  MaxScore, 0)
+
+VAR L_EIT  = FORMAT(Nota_EIT,  "0")
+VAR L_ECL  = FORMAT(Nota_ECL,  "0")
+VAR L_GF   = FORMAT(Nota_GF,   "0")
+VAR L_HDU  = FORMAT(Nota_HDU,  "0")
+VAR L_IUEC = FORMAT(Nota_IUEC, "0")
+VAR L_MSSA = FORMAT(Nota_MSSA, "0")
+VAR L_SBIS = FORMAT(Nota_SBIS, "0")
+VAR L_SPPC = FORMAT(Nota_SPPC, "0")
+VAR L_TMU  = FORMAT(Nota_TMU,  "0")
+
+// =======================================================
+// 3. GEOMETRIA
+// =======================================================
+VAR R  = 135
+VAR CX = 250
+VAR CY = 250
+VAR X1 = INT(CX + R * v_EIT  * 0.00000)  VAR Y1 = INT(CY + R * v_EIT  * -1.00000)
+VAR X2 = INT(CX + R * v_ECL  * 0.64278)  VAR Y2 = INT(CY + R * v_ECL  * -0.76604)
+VAR X3 = INT(CX + R * v_GF   * 0.98480)  VAR Y3 = INT(CY + R * v_GF   * -0.17364)
+VAR X4 = INT(CX + R * v_HDU  * 0.86602)  VAR Y4 = INT(CY + R * v_HDU  * 0.50000)
+VAR X5 = INT(CX + R * v_IUEC * 0.34202)  VAR Y5 = INT(CY + R * v_IUEC * 0.93969)
+VAR X6 = INT(CX + R * v_MSSA * -0.34202) VAR Y6 = INT(CY + R * v_MSSA * 0.93969)
+VAR X7 = INT(CX + R * v_SBIS * -0.86602) VAR Y7 = INT(CY + R * v_SBIS * 0.50000)
+VAR X8 = INT(CX + R * v_SPPC * -0.98480) VAR Y8 = INT(CY + R * v_SPPC * -0.17364)
+VAR X9 = INT(CX + R * v_TMU  * -0.64278) VAR Y9 = INT(CY + R * v_TMU  * -0.76604)
+
+VAR Pts = "M " & X1 & "," & Y1 & " L " & X2 & "," & Y2 & " L " & X3 & "," & Y3 & " L " & X4 & "," & Y4 & " L " & X5 & "," & Y5 & " L " & X6 & "," & Y6 & " L " & X7 & "," & Y7 & " L " & X8 & "," & Y8 & " L " & X9 & "," & Y9 & " Z"
+
+// Ajustes Anti-Sobreposição (Mantendo notas coladas no ponto, mas títulos bem afastados)
+VAR OffY1 = Y1 - 12   VAR OffX2 = X2 + 12  VAR OffY2 = Y2 - 6   VAR OffX3 = X3 + 14  VAR OffY3 = Y3 - 2
+VAR OffX4 = X4 + 12  VAR OffY4 = Y4 + 14  VAR OffY5 = Y5 + 16  VAR OffY6 = Y6 + 16  VAR OffX7 = X7 - 12
+VAR OffY7 = Y7 + 14  VAR OffX8 = X8 - 14  VAR OffY8 = Y8 - 2   VAR OffX9 = X9 - 12  VAR OffY9 = Y9 - 6
+
+// =======================================================
+// 4. HTML / SVG
+// =======================================================
+VAR CSS = ".dp{fill:url(#grad);stroke:" & v_CorPrimaria & ";stroke-width:2.5;opacity:0;animation:fadeIn " & v_TempoAnimacao & " ease forwards} .dd{fill:" & v_CorPrimaria & ";stroke:#fff;stroke-width:2;opacity:0;animation:fadeIn .5s ease .4s forwards} .vl{font-family:sans-serif;font-size:11px;font-weight:700;fill:" & v_CorPrimaria & ";opacity:0;animation:fadeIn .5s ease .5s forwards} .gr{fill:none;stroke:#D1D5DB;stroke-width:1;stroke-dasharray:6 4} .al{stroke:#E2E8F0;stroke-width:1} .am{font-family:sans-serif;font-size:12px;font-weight:700;fill:#374151;text-anchor:middle} .as{font-family:sans-serif;font-size:10px;fill:#9CA3AF;text-anchor:middle}"
+
+VAR HTML_Inicio = "<div style='width:100%;height:100%;display:flex;justify-content:center;align-items:center;'><svg viewBox='0 0 500 500' width='100%' height='100%' style='overflow:visible;'><defs>
+    <linearGradient id='grad' x1='0%' y1='0%' x2='0%' y2='100%'>
+        <stop offset='0%' style='stop-color:" & v_CorPrimaria & ";stop-opacity:0.6' />
+        <stop offset='100%' style='stop-color:" & v_CorSecundaria & ";stop-opacity:0.2' />
+    </linearGradient>
+    <style>@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}} " & CSS & "</style></defs>"
+
+VAR HTML_Grid = "<circle cx='250' cy='250' r='33' class='gr'/><circle cx='250' cy='250' r='67' class='gr'/><circle cx='250' cy='250' r='101' class='gr'/><circle cx='250' cy='250' r='135' class='gr'/>"
+
+VAR HTML_Linhas = "<line x1='250' y1='250' x2='250' y2='115' class='al'/><line x1='250' y1='250' x2='337' y2='169' class='al'/><line x1='250' y1='250' x2='383' y2='226' class='al'/><line x1='250' y1='250' x2='367' y2='318' class='al'/><line x1='250' y1='250' x2='296' y2='377' class='al'/><line x1='250' y1='250' x2='204' y2='377' class='al'/><line x1='250' y1='250' x2='133' y2='318' class='al'/><line x1='250' y1='250' x2='117' y2='226' class='al'/><line x1='250' y1='250' x2='163' y2='169' class='al'/>"
+
+VAR HTML_Corpo = "<path d='" & Pts & "' class='dp'/>" &
+    "<circle cx='"&X1&"' cy='"&Y1&"' r='4' class='dd'/><circle cx='"&X2&"' cy='"&Y2&"' r='4' class='dd'/><circle cx='"&X3&"' cy='"&Y3&"' r='4' class='dd'/><circle cx='"&X4&"' cy='"&Y4&"' r='4' class='dd'/><circle cx='"&X5&"' cy='"&Y5&"' r='4' class='dd'/><circle cx='"&X6&"' cy='"&Y6&"' r='4' class='dd'/><circle cx='"&X7&"' cy='"&Y7&"' r='4' class='dd'/><circle cx='"&X8&"' cy='"&Y8&"' r='4' class='dd'/><circle cx='"&X9&"' cy='"&Y9&"' r='4' class='dd'/>" &
+    "<text x='"&X1&"' y='"&OffY1&"' class='vl' text-anchor='middle'>"&L_EIT&"</text><text x='"&OffX2&"' y='"&OffY2&"' class='vl' text-anchor='start'>"&L_ECL&"</text><text x='"&OffX3&"' y='"&OffY3&"' class='vl' text-anchor='start'>"&L_GF&"</text><text x='"&OffX4&"' y='"&OffY4&"' class='vl' text-anchor='start'>"&L_HDU&"</text><text x='"&X5&"' y='"&OffY5&"' class='vl' text-anchor='middle'>"&L_IUEC&"</text><text x='"&X6&"' y='"&OffY6&"' class='vl' text-anchor='middle'>"&L_MSSA&"</text><text x='"&OffX7&"' y='"&OffY7&"' class='vl' text-anchor='end'>"&L_SBIS&"</text><text x='"&OffX8&"' y='"&OffY8&"' class='vl' text-anchor='end'>"&L_SPPC&"</text><text x='"&OffX9&"' y='"&OffY9&"' class='vl' text-anchor='end'>"&L_TMU&"</text>"
+
+// Rótulos movidos para o limite externo do SVG para evitar sobreposição total
+VAR HTML_Rotulos = "<text x='250' y='75' class='am'>E.I.T</text><text x='250' y='88' class='as'>Economia</text><text x='400' y='110' class='am'>E.C.L</text><text x='400' y='123' class='as'>Educação</text><text x='460' y='225' class='am'>G.F</text><text x='460' y='238' class='as'>Governança</text><text x='425' y='380' class='am'>H.D.U</text><text x='425' y='393' class='as'>Habitação</text><text x='320' y='450' class='am'>I.U.E.C</text><text x='320' y='463' class='as'>Infraestrutura</text><text x='180' y='450' class='am'>MA.S.S.A</text><text x='180' y='463' class='as'>Meio Ambiente</text><text x='75' y='380' class='am'>S.B.I.S</text><text x='75' y='393' class='as'>Saúde</text><text x='40' y='225' class='am'>S.P.P.C</text><text x='40' y='238' class='as'>Segurança</text><text x='100' y='110' class='am'>T.M.U</text><text x='100' y='123' class='as'>Transporte</text>"
+
+RETURN HTML_Inicio & HTML_Grid & HTML_Linhas & HTML_Corpo & HTML_Rotulos & "</svg></div>"

@@ -1,0 +1,74 @@
+Menu Eixos = 
+VAR TextoMenu = SELECTEDVALUE('INDICADORES'[EIXO])
+
+// Conta os botões para dividir a tela perfeitamente
+VAR TotalBotoes = CALCULATE(
+    DISTINCTCOUNT('INDICADORES'[EIXO]),
+    ALLSELECTED('INDICADORES')
+)
+
+RETURN
+"
+<style>
+  html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+  }
+
+  .nav-wrapper {
+      height: calc(100vh / " & TotalBotoes & ");
+      width: 100%;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      padding-right: 12px;
+  }
+
+  /* 1. ESTADO PADRÃO: Azul e na posição original */
+  .nav-button {
+    height: 85%;
+    width: 100%;
+    background-color: #3B538C;
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 0 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    transform: translateX(0); 
+  }
+
+  /* 2. SELECIONADO: Se existe clique na tela, a base vira Verde */
+  body:has(.unselected) .nav-button {
+      background-color: #93BA3A; 
+  }
+
+  /* 3. NÃO SELECIONADOS: Forçados a voltar para o Azul Sólido */
+  .unselected .nav-button {
+      background-color: #3B538C !important;
+      
+  }
+
+  /* 4. A ANIMAÇÃO (HOVER): Agora com !important para nunca ser bloqueada */
+  .nav-wrapper:hover .nav-button {
+    filter: brightness(1.15) !important; 
+    transform: translateX(8px) !important;
+    box-shadow: -4px 4px 10px rgba(0,0,0,0.2) !important;
+  }
+</style>
+
+<div class='nav-wrapper'>
+  <div class='nav-button'>
+    " & TextoMenu & "
+  </div>
+</div>
+"

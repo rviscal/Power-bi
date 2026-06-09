@@ -1,0 +1,122 @@
+GraficoBarrasHorizontais_HTML = 
+// =========================================================
+// 1. VARIÁVEIS DE COR
+// =========================================================
+VAR vCorBase = "#2B4C8A" 
+VAR vCorTopo = "#4A7BE0" 
+
+// =========================================================
+// 2. CALCULAR A ESCALA MÁXIMA
+// =========================================================
+VAR vMaiorValor = MAXX(ALLSELECTED('SAU_001 (2)'[TIPO_ESTABELECIMENTO]), CALCULATE(SUM('SAU_001 (2)'[QTD_ESTABELECIMENTOS])))
+
+// =========================================================
+// 3. CSS MODERNO E RESPONSIVO
+// =========================================================
+VAR vCSS = "
+<style>
+    .container-horiz {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Mais respiro entre os blocos */
+        width: 100%;
+        height: 100vh;
+        overflow-y: auto; 
+        padding: 10px 15px 20px 5px;
+        font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+        box-sizing: border-box;
+        cursor: default !important;
+    }
+
+    .container-horiz::-webkit-scrollbar { width: 5px; }
+    .container-horiz::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+
+    .linha {
+        display: flex;
+        align-items: center; 
+        width: 100%;
+        min-height: 24px; 
+        padding-bottom: 8px; /* Dá espaço antes de desenhar a linha divisória */
+        border-bottom: 1px solid #F1F5F9; /* Linha-guia super sutil para separar os itens */
+    }
+
+    /* Remove a borda do último item para ficar mais limpo */
+    .linha:last-child {
+        border-bottom: none;
+    }
+
+    .rotulo {
+        width: 35%; 
+        text-align: right;
+        padding-right: 12px; /* Afasta um pouco mais o texto do início da barra */
+        font-size: 9px; 
+        font-weight: 600;
+        color: #64748B;
+        white-space: normal; 
+        word-wrap: break-word;
+        line-height: 1.15; 
+    }
+
+    .area-barra {
+        width: 65%; 
+        display: flex;
+        align-items: center;
+    }
+
+    .barra {
+        height: 20px; /* Barra mais grossa para acompanhar o texto empilhado */
+        background: linear-gradient(90deg, " & vCorBase & " 0%, " & vCorTopo & " 100%);
+        border-radius: 0 6px 6px 0; /* Curva um pouco mais suave */
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        animation: crescer-horiz 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        width: 0;
+    }
+
+    .valor {
+        margin-left: 10px; 
+        font-size: 10px;
+        font-weight: bold;
+        color: #475569;
+    }
+
+    @keyframes crescer-horiz {
+        from { width: 0%; }
+        to { width: var(--val); }
+    }
+</style>
+"
+
+// =========================================================
+// 4. GERAR O HTML DINÂMICO
+// =========================================================
+VAR vLinhasHTML = 
+    CONCATENATEX(
+        VALUES('SAU_001 (2)'[TIPO_ESTABELECIMENTO]),
+        
+        VAR vValor = CALCULATE(SUM('SAU_001 (2)'[QTD_ESTABELECIMENTOS]))
+        VAR vPerc = IF(ISBLANK(vValor) || vMaiorValor = 0, 0, DIVIDE(vValor, vMaiorValor) * 100)
+        
+        VAR vPercAjustado = vPerc * 0.85 
+        VAR vPercCSS = SUBSTITUTE(FORMAT(vPercAjustado, "0.00"), ",", ".") & "%"
+        
+        VAR vTxtValor = FORMAT(vValor, "#,##0")
+        
+        RETURN
+        "<div class='linha'>
+            <div class='rotulo'>" & 'SAU_001 (2)'[TIPO_ESTABELECIMENTO] & "</div>
+            <div class='area-barra'>
+                <div class='barra' style='--val: " & vPercCSS & ";'></div>
+                <div class='valor'>" & vTxtValor & "</div>
+            </div>
+        </div>",
+        
+        "", 
+        
+        CALCULATE(SUM('SAU_001 (2)'[QTD_ESTABELECIMENTOS])), DESC
+    )
+
+// =========================================================
+// 5. RETORNO FINAL
+// =========================================================
+RETURN
+    vCSS & "<div class='container-horiz'>" & vLinhasHTML & "</div>"

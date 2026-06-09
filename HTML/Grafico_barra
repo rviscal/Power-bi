@@ -1,0 +1,113 @@
+GraficoBarras_HTML = 
+// =========================================================
+// 1. VARIÁVEIS DE COR (Mude as cores em HEX aqui!)
+// =========================================================
+VAR vCorBase = "#2B4C8A"        // Cor principal escurecida (base da barra)
+VAR vCorTopo = "#4A7BE0"        // Cor mais clara (topo da barra, para o degradê)
+
+// 2. Descobrir o maior valor no contexto atual
+VAR vMaiorValor = MAXX(ALLSELECTED(SE_005[Setor]), [Setores Econômicos Principais])
+
+// 3. Bloco de CSS Moderno (Estático, com Cursor Padrão)
+VAR vCSS = "
+<style>
+    .container-grafico {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        height: 100vh; 
+        width: 100%;
+        padding-top: 45px; 
+        padding-bottom: 90px; 
+        padding-left: 25px; 
+        padding-right: 15px; 
+        font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden; 
+        cursor: default !important; /* <-- TRAVA A SETINHA PADRÃO NO FUNDO */
+    }
+    
+    .container-grafico::after {
+        content: '';
+        position: absolute;
+        bottom: 90px; 
+        left: 0;
+        width: 100%;
+        height: 1px; 
+        background-color: #E2E8F0; 
+        z-index: 1;
+    }
+
+    .barra {
+        width: 14%; 
+        background: linear-gradient(180deg, " & vCorTopo & " 0%, " & vCorBase & " 100%);
+        position: relative;
+        animation: crescer 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        border-radius: 6px 6px 0 0; 
+        height: 0; 
+        z-index: 2; 
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15); 
+        cursor: default !important; /* <-- TRAVA A SETINHA PADRÃO NAS BARRAS */
+    }
+
+    .valor {
+        position: absolute;
+        bottom: 100%; 
+        margin-bottom: 10px; 
+        width: 100%;
+        text-align: center;
+        font-size: 12px; 
+        font-weight: 800; 
+        color: #1E293B; 
+        letter-spacing: 0.5px;
+        cursor: default !important;
+    }
+
+    .rotulo {
+        position: absolute;
+        top: 100%; 
+        right: 50%; 
+        transform: rotate(-45deg); 
+        transform-origin: top right; 
+        margin-top: 14px; 
+        padding-right: 5px; 
+        font-size: 10px;
+        font-weight: 600; 
+        color: #64748B; 
+        white-space: nowrap; 
+        cursor: default !important;
+    }
+
+    @keyframes crescer {
+        from { height: 0%; }
+        to { height: var(--val); }
+    }
+</style>
+"
+
+// 4. Gerar dinamicamente uma barra para cada setor
+VAR vBarrasHTML = 
+    CONCATENATEX(
+        VALUES(SE_005[Setor]),
+        
+        VAR vValorAtual = [Setores Econômicos Principais]
+        VAR vPercentual = DIVIDE(vValorAtual, vMaiorValor, 0) * 100
+        
+        VAR vPercFormatado = SUBSTITUTE(FORMAT(vPercentual, "0.00"), ",", ".") & "%"
+        VAR vValorFormatado = FORMAT(vValorAtual, "#,##0")
+        
+        RETURN
+        "<div class='barra' style='--val: " & vPercFormatado & ";'>
+            <div class='valor'>" & vValorFormatado & "</div>
+            <div class='rotulo'>" & SE_005[Setor] & "</div>
+        </div>",
+        
+        "",
+        
+        [Setores Econômicos Principais], DESC
+    )
+
+// 5. Juntar o CSS com o HTML gerado
+RETURN
+    vCSS & "<div class='container-grafico'>" & vBarrasHTML & "</div>"
